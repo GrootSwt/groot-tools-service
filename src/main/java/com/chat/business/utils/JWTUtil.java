@@ -1,4 +1,4 @@
-package com.chat.base.utils;
+package com.chat.business.utils;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -8,14 +8,16 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.chat.base.exception.BusinessRuntimeException;
+import com.chat.business.model.User;
 
 public class JWTUtil {
 
-    public static String getToken(String username) {
+    public static String getToken(User user) {
         try {
             Algorithm algorithm = Algorithm.HMAC256("chat");
             return JWT.create()
-                    .withClaim("username", username)
+                    .withClaim("username", user.getUsername())
+                    .withClaim("id", user.getId())
                     .sign(algorithm);
         }catch (JWTCreationException e) {
             e.printStackTrace();
@@ -23,14 +25,18 @@ public class JWTUtil {
         }
     }
 
-    public static String verifyToken(String token) {
+    public static User verifyToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256("chat");
             JWTVerifier jwtVerifier = JWT.require(algorithm)
                     .build();
             DecodedJWT decodedJWT = jwtVerifier.verify(token);
             Claim username = decodedJWT.getClaim("username");
-            return username.asString();
+            Claim id = decodedJWT.getClaim("id");
+            User user = new User();
+            user.setId(id.asString());
+            user.setUsername(username.asString());
+            return user;
         }catch (JWTVerificationException e) {
             e.printStackTrace();
             throw new BusinessRuntimeException("token验证失败", 410);

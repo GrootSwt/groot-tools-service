@@ -2,7 +2,7 @@ package com.chat.business.controller;
 
 import com.chat.base.bean.result.BaseResult;
 import com.chat.base.exception.BusinessRuntimeException;
-import com.chat.base.utils.JWTUtil;
+import com.chat.business.utils.JWTUtil;
 import com.chat.business.model.User;
 import com.chat.business.service.UserService;
 import jakarta.servlet.http.Cookie;
@@ -30,7 +30,7 @@ public class LoginController {
         if (null == result) {
             throw new BusinessRuntimeException("账号或密码不正确");
         }
-        Cookie cookie = new Cookie("token", JWTUtil.getToken(result.getUsername()));
+        Cookie cookie = new Cookie("token", JWTUtil.getToken(result));
         cookie.setPath("/");
         response.addCookie(cookie);
         return BaseResult.success("登陆成功");
