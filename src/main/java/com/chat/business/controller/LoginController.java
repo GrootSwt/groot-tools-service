@@ -30,9 +30,15 @@ public class LoginController {
         if (null == result) {
             throw new BusinessRuntimeException("账号或密码不正确");
         }
-        Cookie cookie = new Cookie("token", JWTUtil.getToken(result));
-        cookie.setPath("/");
-        response.addCookie(cookie);
+
+        Cookie tokenCookie = new Cookie("token", JWTUtil.getToken(result));
+        tokenCookie.setPath("/");
+        response.addCookie(tokenCookie);
+
+        Cookie userIdCookie = new Cookie("userId", result.getId());
+        userIdCookie.setPath("/");
+        response.addCookie(userIdCookie);
+
         return BaseResult.success("登陆成功");
     }
 }

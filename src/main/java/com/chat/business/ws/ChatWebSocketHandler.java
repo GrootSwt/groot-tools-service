@@ -5,20 +5,21 @@ import com.chat.business.model.Message;
 import com.chat.business.model.User;
 import com.chat.business.service.MessageService;
 import com.chat.business.utils.JWTUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.*;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.WebSocketMessage;
+import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
-
+@Slf4j
 @Component
 public class ChatWebSocketHandler implements WebSocketHandler {
-
-    Logger logger = LoggerFactory.getLogger(ChatWebSocketHandler.class);
 
     private final MessageService messageService;
 
@@ -34,18 +35,36 @@ public class ChatWebSocketHandler implements WebSocketHandler {
         HttpHeaders handshakeHeaders = session.getHandshakeHeaders();
         List<String> protocols = handshakeHeaders.get("Sec-WebSocket-Protocol");
         if (null != protocols && !protocols.isEmpty()) {
-            User user = JWTUtil.verifyToken(protocols.get(0));
-            List<Message> messages = messageService.listByUserId(user.getId());
-            TextMessage message = new TextMessage(JSON.toJSONString(messages));
-            session.sendMessage(message);
+            JWTUtil.verifyToken(protocols.get(0));
             sessions.add(session);
             sessionNumber.addAndGet(1);
-            logger.info("连接成功，当前连接数：" + sessionNumber.get());
+            log.info("连接成功，当前连接数：" + sessionNumber.get());
         }
     }
 
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
+        if (message.getPayload() instanceof String) {
+            Message data = JSON.parseObject((String) message.getPayload(), Message.class);
+            log.info("接收到的消息：" + message.getPayload());
+            HttpHeaders handshakeHeaders = session.getHandshakeHeaders();
+            List<String> protocols = handshakeHeaders.get("Sec-WebSocket-Protocol");
+            if (null != protocols && !protocols.isEmpty()) {
+                User user = JWTUtil.verifyToken(protocols.get(0));
+                data.setUserId(user.getId());
+                messageService.save(data);
+                log.info(user.getUsername() + "群发消息：" + message.getPayload());
+                sessions.forEach(s -> {
+                    if (!s.equals(session)) {
+                        try {
+                            s.sendMessage(message);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        }
 
     }
 
@@ -58,7 +77,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         sessions.remove(session);
         sessionNumber.addAndGet(-1);
-        logger.info("断开连接，当前连接数：" + sessionNumber.get());
+        log.info("断开连接，当前连接数：" + sessionNumber.get());
     }
 
     @Override

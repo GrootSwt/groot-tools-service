@@ -21,7 +21,7 @@ public class JWTUtil {
                     .sign(algorithm);
         }catch (JWTCreationException e) {
             e.printStackTrace();
-            throw new BusinessRuntimeException("token生成失败", 410);
+            throw new BusinessRuntimeException("token生成失败", 401);
         }
     }
 
@@ -39,7 +39,7 @@ public class JWTUtil {
             return user;
         }catch (JWTVerificationException e) {
             e.printStackTrace();
-            throw new BusinessRuntimeException("token验证失败", 410);
+            throw new BusinessRuntimeException("token验证失败", 401);
         }
     }
 }

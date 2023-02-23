@@ -24,6 +24,12 @@ public class MessageServiceImpl implements MessageService {
     public List<Message> listByUserId(String userId) {
         QueryWrapper<Message> wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", userId);
+        wrapper.orderByAsc("create_time");
         return messageMapper.selectList(wrapper);
+    }
+
+    @Override
+    public void save(Message message) {
+        messageMapper.insert(message);
     }
 }
