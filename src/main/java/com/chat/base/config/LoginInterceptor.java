@@ -16,21 +16,23 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         Cookie[] cookies = request.getCookies();
-        String userId = "";
-        String token = "";
-        for (Cookie cookie : cookies) {
-            if ("userId".equals(cookie.getName()) && !"".equals(cookie.getValue())) {
-                userId = cookie.getValue();
-                continue;
+        if (null != cookies) {
+            String userId = "";
+            String token = "";
+            for (Cookie cookie : cookies) {
+                if ("userId".equals(cookie.getName()) && !"".equals(cookie.getValue())) {
+                    userId = cookie.getValue();
+                    continue;
+                }
+                if ("token".equals(cookie.getName()) && !"".equals(cookie.getValue())) {
+                    token = cookie.getValue();
+                }
             }
-            if ("token".equals(cookie.getName()) && !"".equals(cookie.getValue())) {
-                token = cookie.getValue();
-            }
-        }
-        if (!userId.equals("") && !token.equals("")) {
-            User user = JWTUtil.verifyToken(token);
-            if (userId.equals(user.getId())) {
-                return  true;
+            if (!userId.equals("") && !token.equals("")) {
+                User user = JWTUtil.verifyToken(token);
+                if (userId.equals(user.getId())) {
+                    return  true;
+                }
             }
         }
         throw new BusinessRuntimeException("登录状态校验失败，请重新登录", 401);
