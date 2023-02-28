@@ -14,20 +14,20 @@ public class ListResult<T> extends BaseResult {
     private List<T> data;
 
 
-    public ListResult(Status status, String message) {
-        super(status, message);
+    public ListResult(String message) {
+        super(message);
     }
 
-    public ListResult(Status status, String message, List<T> data) {
-        super(status, message);
+    public ListResult(String message, List<T> data) {
+        super(message);
         this.data = data;
     }
 
     public static <T> ListResult<T> success(String message, List<T> data) {
-        return new ListResult<>(Status.success, message, data);
+        return new ListResult<>(message, data);
     }
 
     public static <T> ListResult<T> failure(String message, List<T> data) {
-        return new ListResult<>(Status.success, message, data);
+        return new ListResult<>(message, data);
     }
 }

@@ -13,31 +13,39 @@ public class WebSocketResult<T> extends BaseResult {
 
     private T data;
 
-    public WebSocketResult(Status status, String message) {
-        super(status, message);
+    private WebSocketOperationType operationType;
+
+    public WebSocketResult(String message) {
+        super(message);
     }
 
-    public WebSocketResult(Status status, String message, T data) {
-        super(status, message);
+    public WebSocketResult(WebSocketOperationType operationType, String message, T data) {
+        super(message);
+        this.operationType = operationType;
         this.data = data;
     }
 
-    public WebSocketResult(Status status, String message, Integer code) {
-        super(status, message);
+    public WebSocketResult(String message, T data) {
+        super(message);
+        this.data = data;
+    }
+
+    public WebSocketResult(Integer code, String message) {
+        super(message);
         this.code = code;
     }
 
-    public WebSocketResult(Status status, String message, Integer code, T data) {
-        super(status, message);
+    public WebSocketResult(Integer code, String message, T data) {
+        super(message);
         this.code = code;
         this.data = data;
     }
 
-    public static <T> WebSocketResult<T> success(String message, T data) {
-        return new WebSocketResult<T>(Status.success, message, data);
+    public static <T> WebSocketResult<T> success(WebSocketOperationType operationType, String message, T data) {
+        return new WebSocketResult<>(operationType, message, data);
     }
 
     public static <T> WebSocketResult<T> failure(Integer code, String message) {
-        return new WebSocketResult<T>(Status.failure, message, code);
+        return new WebSocketResult<>(code, message);
     }
 }

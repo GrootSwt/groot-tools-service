@@ -1,5 +1,6 @@
 package com.chat.business.ws;
 
+import com.chat.base.bean.result.WebSocketOperationType;
 import com.chat.base.bean.result.WebSocketResult;
 import com.chat.base.exception.BusinessWebSocketException;
 import com.chat.business.model.Message;
@@ -22,8 +23,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @Component
 public class ChatWebSocketHandler implements WebSocketHandler {
-
-    private static final String HEARTBEAT = "heartbeat";
 
     private final MessageService messageService;
 
@@ -51,7 +50,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         User user = getUserFromProtocols(session);
         if (message.getPayload() instanceof String) {
-            if (HEARTBEAT.equals(message.getPayload())) {
+            if (WebSocketOperationType.heartbeat.getValue().equals(message.getPayload())) {
                 session.sendMessage(message);
             } else {
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -62,7 +61,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
                 log.info(user.getUsername() + "群发消息：" + message.getPayload());
                 sessions.forEach(s -> {
                     try {
-                        s.sendMessage(new TextMessage(objectMapper.writeValueAsString(WebSocketResult.success("群发消息", data))));
+                        s.sendMessage(new TextMessage(objectMapper.writeValueAsString(WebSocketResult.success(WebSocketOperationType.append, "群发消息", data))));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -95,7 +94,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
             log.info("心跳检测前连接数量：" + sessions.size());
             while (iterator.hasNext()) {
                 try {
-                    iterator.next().sendMessage(new TextMessage(HEARTBEAT));
+                    iterator.next().sendMessage(new TextMessage(WebSocketOperationType.heartbeat.getValue()));
                 } catch (IOException e) {
                     iterator.remove();
                 }
@@ -109,7 +108,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
         for (WebSocketSession session : sessions) {
             if (getUserFromProtocols(session).getId().equals(userId)) {
                 ObjectMapper objectMapper = new ObjectMapper();
-                session.sendMessage(new TextMessage(objectMapper.writeValueAsString(WebSocketResult.success("获取消息列表成功", messages))));
+                session.sendMessage(new TextMessage(objectMapper.writeValueAsString(WebSocketResult.success(WebSocketOperationType.replace, "获取消息列表成功", messages))));
             }
         }
     }

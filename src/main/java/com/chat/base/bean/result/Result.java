@@ -11,20 +11,20 @@ public class Result<T> extends BaseResult {
 
     private T data;
 
-    public Result(Status status, String message) {
-        super(status, message);
+    public Result(String message) {
+        super(message);
     }
 
-    public Result(Status status, String message, T data) {
-        super(status, message);
+    public Result(String message, T data) {
+        super(message);
         this.data = data;
     }
 
     public static <T> Result<T> failure(String message, T data) {
-        return new Result<>(Status.failure, message, data);
+        return new Result<>(message, data);
     }
 
     public static <T> Result<T> success(String message, T data) {
-        return new Result<>(Status.success, message, data);
+        return new Result<>(message, data);
     }
 }
