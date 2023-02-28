@@ -2,7 +2,10 @@ package com.chat.base.config;
 
 import com.chat.base.bean.result.BaseResult;
 import com.chat.base.bean.result.Result;
+import com.chat.base.bean.result.WebSocketResult;
 import com.chat.base.exception.BusinessRuntimeException;
+import com.chat.base.exception.BusinessWebSocketException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.ObjectError;
@@ -10,7 +13,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.socket.TextMessage;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -50,6 +55,13 @@ public class GlobalExceptionHandler {
             return Result.failure(message.toString());
         }
         return BaseResult.failure(e.getMessage());
+    }
+
+    @ExceptionHandler(value = BusinessWebSocketException.class)
+    public void exceptionHandler(BusinessWebSocketException e) throws IOException {
+        WebSocketResult<Void> result = WebSocketResult.failure(e.getCode(), e.getMessage());
+        ObjectMapper objectMapper = new ObjectMapper();
+        e.getSession().sendMessage(new TextMessage(objectMapper.writeValueAsString(result)));
     }
 
     @ExceptionHandler(value = Exception.class)

@@ -14,4 +14,6 @@ public class Message extends BaseModel {
     private String message;
 
     private MessageType messageType;
+
+
 }

@@ -1,13 +1,16 @@
 package com.chat.business.ws;
 
-import com.alibaba.fastjson2.JSON;
+import com.chat.base.bean.result.WebSocketResult;
+import com.chat.base.exception.BusinessWebSocketException;
 import com.chat.business.model.Message;
 import com.chat.business.model.User;
 import com.chat.business.service.MessageService;
 import com.chat.business.utils.JWTUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.socket.*;
 
 import java.io.IOException;
@@ -15,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
+
 @Slf4j
 @Component
 public class ChatWebSocketHandler implements WebSocketHandler {
@@ -30,6 +34,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
     public ChatWebSocketHandler(MessageService messageService) {
         this.messageService = messageService;
     }
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         HttpHeaders handshakeHeaders = session.getHandshakeHeaders();
@@ -44,29 +49,24 @@ public class ChatWebSocketHandler implements WebSocketHandler {
 
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
+        User user = getUserFromProtocols(session);
         if (message.getPayload() instanceof String) {
             if (HEARTBEAT.equals(message.getPayload())) {
                 session.sendMessage(message);
             } else {
-                Message data = JSON.parseObject((String) message.getPayload(), Message.class);
+                ObjectMapper objectMapper = new ObjectMapper();
+                Message data = objectMapper.readValue((String) message.getPayload(), Message.class);
                 log.info("接收到的消息：" + message.getPayload());
-                HttpHeaders handshakeHeaders = session.getHandshakeHeaders();
-                List<String> protocols = handshakeHeaders.get("Sec-WebSocket-Protocol");
-                if (null != protocols && !protocols.isEmpty()) {
-                    User user = JWTUtil.verifyToken(protocols.get(0));
-                    data.setUserId(user.getId());
-                    messageService.save(data);
-                    log.info(user.getUsername() + "群发消息：" + message.getPayload());
-                    sessions.forEach(s -> {
-                        if (!s.equals(session)) {
-                            try {
-                                s.sendMessage(message);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                }
+                data.setUserId(user.getId());
+                messageService.save(data);
+                log.info(user.getUsername() + "群发消息：" + message.getPayload());
+                sessions.forEach(s -> {
+                    try {
+                        s.sendMessage(new TextMessage(objectMapper.writeValueAsString(WebSocketResult.success("群发消息", data))));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
             }
 
         }
@@ -103,5 +103,26 @@ public class ChatWebSocketHandler implements WebSocketHandler {
             sessionNumber.set(sessions.size());
             log.info("心跳检测后链接数量：" + sessions.size());
         }
+    }
+
+    public static void sendAll(String userId, List<Message> messages) throws IOException {
+        for (WebSocketSession session : sessions) {
+            if (getUserFromProtocols(session).getId().equals(userId)) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                session.sendMessage(new TextMessage(objectMapper.writeValueAsString(WebSocketResult.success("获取消息列表成功", messages))));
+            }
+        }
+    }
+
+    private static User getUserFromProtocols(WebSocketSession session) {
+        HttpHeaders handshakeHeaders = session.getHandshakeHeaders();
+        List<String> protocols = handshakeHeaders.get("Sec-WebSocket-Protocol");
+        if (null != protocols && !protocols.isEmpty()) {
+            User user = JWTUtil.verifyToken(protocols.get(0));
+            if (StringUtils.hasText(user.getId()) && StringUtils.hasText(user.getUsername())) {
+                return user;
+            }
+        }
+        throw new BusinessWebSocketException(session, "用户信息校验失败", 401);
     }
 }

@@ -16,7 +16,17 @@ public class BaseResult implements Serializable {
     protected String message;
 
     public enum Status {
-        success, failure, unauthorized;
+        success("success"), failure("failure"), unauthorized("unauthorized");
+
+        private final String value;
+
+        private Status(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 
     public BaseResult(Status status, String message) {

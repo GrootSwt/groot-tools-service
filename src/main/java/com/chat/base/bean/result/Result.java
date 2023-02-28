@@ -20,7 +20,6 @@ public class Result<T> extends BaseResult {
         this.data = data;
     }
 
-
     public static <T> Result<T> failure(String message, T data) {
         return new Result<>(Status.failure, message, data);
     }
