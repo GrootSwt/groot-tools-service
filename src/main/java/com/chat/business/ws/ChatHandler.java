@@ -1,8 +1,8 @@
 package com.chat.business.ws;
 
+import com.chat.base.exception.ChatRuntimeException;
 import com.chat.business.bean.ChatOperationType;
 import com.chat.business.bean.result.ChatResult;
-import com.chat.base.exception.ChatRuntimeException;
 import com.chat.business.model.Message;
 import com.chat.business.model.User;
 import com.chat.business.service.MessageService;
@@ -15,7 +15,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.socket.*;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -126,4 +125,3 @@ public class ChatHandler implements WebSocketHandler {
         throw new ChatRuntimeException(401, session, "用户信息校验失败");
     }
 }
-        Arrays.isE
