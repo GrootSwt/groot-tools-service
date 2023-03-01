@@ -2,9 +2,9 @@ package com.chat.base.config;
 
 import com.chat.base.bean.result.BaseResult;
 import com.chat.base.bean.result.Result;
-import com.chat.base.bean.result.WebSocketResult;
+import com.chat.business.bean.result.ChatResult;
 import com.chat.base.exception.BusinessRuntimeException;
-import com.chat.base.exception.BusinessWebSocketException;
+import com.chat.base.exception.ChatRuntimeException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -57,9 +57,9 @@ public class GlobalExceptionHandler {
         return BaseResult.failure(e.getMessage());
     }
 
-    @ExceptionHandler(value = BusinessWebSocketException.class)
-    public void exceptionHandler(BusinessWebSocketException e) throws IOException {
-        WebSocketResult<Void> result = WebSocketResult.failure(e.getCode(), e.getMessage());
+    @ExceptionHandler(value = ChatRuntimeException.class)
+    public void exceptionHandler(ChatRuntimeException e) throws IOException {
+        ChatResult<Void> result = ChatResult.failure(e.getCode(), e.getMessage());
         ObjectMapper objectMapper = new ObjectMapper();
         e.getSession().sendMessage(new TextMessage(objectMapper.writeValueAsString(result)));
     }

@@ -1,8 +1,8 @@
-package com.chat.base.bean.result;
+package com.chat.business.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public enum WebSocketOperationType {
+public enum ChatOperationType {
     @JsonProperty(value = "append")
     append("append"),
     @JsonProperty(value = "replace")
@@ -12,7 +12,7 @@ public enum WebSocketOperationType {
 
     private final String value;
 
-    private WebSocketOperationType(String value) {
+    private ChatOperationType(String value) {
         this.value = value;
     }
 

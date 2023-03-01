@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.chat.business.mapper.MessageMapper;
 import com.chat.business.model.Message;
 import com.chat.business.service.MessageService;
-import com.chat.business.ws.ChatWebSocketHandler;
+import com.chat.business.ws.ChatHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +43,6 @@ public class MessageServiceImpl implements MessageService {
         message.setId(id);
         messageMapper.deleteById(message);
         List<Message> messages = this.listByUserId(userId);
-        ChatWebSocketHandler.sendAll(userId, messages);
+        ChatHandler.sendAll(userId, messages);
     }
 }

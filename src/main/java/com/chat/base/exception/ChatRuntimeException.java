@@ -6,23 +6,23 @@ import org.springframework.web.socket.WebSocketSession;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class BusinessWebSocketException extends RuntimeException{
+public class ChatRuntimeException extends RuntimeException {
 
     private int code = 400;
 
     private WebSocketSession session;
 
-    public BusinessWebSocketException(WebSocketSession session) {
+    public ChatRuntimeException(WebSocketSession session) {
         super();
         this.session = session;
     }
 
-    public BusinessWebSocketException(WebSocketSession session, String message) {
+    public ChatRuntimeException(WebSocketSession session, String message) {
         super(message);
         this.session = session;
     }
 
-    public BusinessWebSocketException(WebSocketSession session, String message, int code) {
+    public ChatRuntimeException(int code, WebSocketSession session, String message) {
         super(message);
         this.session = session;
         this.code = code;
