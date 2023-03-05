@@ -1,11 +1,11 @@
 package com.chat.business.ws;
 
-import com.chat.base.exception.ChatRuntimeException;
+import com.chat.base.exception.WSRuntimeException;
 import com.chat.business.bean.ChatOperationType;
 import com.chat.business.bean.result.ChatResult;
-import com.chat.business.model.Message;
+import com.chat.business.model.Memorandum;
 import com.chat.business.model.User;
-import com.chat.business.service.MessageService;
+import com.chat.business.service.MemorandumService;
 import com.chat.business.utils.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -20,18 +20,21 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 多端长连接备忘录
+ */
 @Slf4j
 @Component
-public class ChatHandler implements WebSocketHandler {
+public class MemorandumHandler implements WebSocketHandler {
 
-    private final MessageService messageService;
+    private final MemorandumService memorandumService;
 
     private static final AtomicInteger sessionNumber = new AtomicInteger(0);
 
     private static final CopyOnWriteArraySet<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
 
-    public ChatHandler(MessageService messageService) {
-        this.messageService = messageService;
+    public MemorandumHandler(MemorandumService memorandumService) {
+        this.memorandumService = memorandumService;
     }
 
     @Override
@@ -39,7 +42,7 @@ public class ChatHandler implements WebSocketHandler {
         HttpHeaders handshakeHeaders = session.getHandshakeHeaders();
         List<String> protocols = handshakeHeaders.get("Sec-WebSocket-Protocol");
         if (null != protocols && !protocols.isEmpty()) {
-            JWTUtil.verifyToken(protocols.get(0));
+            JWTUtil.verifyToken(protocols.get(0), true, session);
             sessions.add(session);
             sessionNumber.addAndGet(1);
             log.info("连接成功，当前连接数：" + sessionNumber.get());
@@ -54,14 +57,16 @@ public class ChatHandler implements WebSocketHandler {
                 session.sendMessage(message);
             } else {
                 ObjectMapper objectMapper = new ObjectMapper();
-                Message data = objectMapper.readValue((String) message.getPayload(), Message.class);
-                log.info("接收到的消息：" + message.getPayload());
+                Memorandum data = objectMapper.readValue((String) message.getPayload(), Memorandum.class);
+                log.info("备忘录内容：" + message.getPayload());
                 data.setUserId(user.getId());
-                messageService.save(data);
-                log.info(user.getUsername() + "群发消息：" + message.getPayload());
+                memorandumService.save(data);
+                log.info(user.getUsername() + "群发备忘录：" + message.getPayload());
                 sessions.forEach(s -> {
                     try {
-                        s.sendMessage(new TextMessage(objectMapper.writeValueAsString(ChatResult.success(ChatOperationType.append, "群发消息", data))));
+                        if (getUserFromProtocols(s).getUsername().equals(user.getUsername())) {
+                            s.sendMessage(new TextMessage(objectMapper.writeValueAsString(ChatResult.success(ChatOperationType.append, "群发消息", data))));
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -104,11 +109,11 @@ public class ChatHandler implements WebSocketHandler {
         }
     }
 
-    public static void sendAll(String userId, List<Message> messages) throws IOException {
+    public static void sendAll(String userId, List<Memorandum> memorandums) throws IOException {
         for (WebSocketSession session : sessions) {
             if (getUserFromProtocols(session).getId().equals(userId)) {
                 ObjectMapper objectMapper = new ObjectMapper();
-                session.sendMessage(new TextMessage(objectMapper.writeValueAsString(ChatResult.success(ChatOperationType.replace, "获取消息列表成功", messages))));
+                session.sendMessage(new TextMessage(objectMapper.writeValueAsString(ChatResult.success(ChatOperationType.replace, "获取消息列表成功", memorandums))));
             }
         }
     }
@@ -117,11 +122,11 @@ public class ChatHandler implements WebSocketHandler {
         HttpHeaders handshakeHeaders = session.getHandshakeHeaders();
         List<String> protocols = handshakeHeaders.get("Sec-WebSocket-Protocol");
         if (null != protocols && !protocols.isEmpty()) {
-            User user = JWTUtil.verifyToken(protocols.get(0));
+            User user = JWTUtil.verifyToken(protocols.get(0), true, session);
             if (StringUtils.hasText(user.getId()) && StringUtils.hasText(user.getUsername())) {
                 return user;
             }
         }
-        throw new ChatRuntimeException(401, session, "用户信息校验失败");
+        throw new WSRuntimeException(401, session, "用户信息校验失败");
     }
 }

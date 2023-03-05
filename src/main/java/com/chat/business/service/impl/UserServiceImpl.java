@@ -28,7 +28,6 @@ public class UserServiceImpl implements UserService {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("username", user.getUsername());
         wrapper.eq("password", user.getPassword());
-        wrapper.eq("system_password", user.getSystemPassword());
         return userMapper.selectOne(wrapper);
     }
 

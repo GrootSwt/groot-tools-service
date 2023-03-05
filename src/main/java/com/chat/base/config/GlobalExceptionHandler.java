@@ -4,7 +4,7 @@ import com.chat.base.bean.result.BaseResult;
 import com.chat.base.bean.result.Result;
 import com.chat.business.bean.result.ChatResult;
 import com.chat.base.exception.BusinessRuntimeException;
-import com.chat.base.exception.ChatRuntimeException;
+import com.chat.base.exception.WSRuntimeException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -57,11 +57,13 @@ public class GlobalExceptionHandler {
         return BaseResult.failure(e.getMessage());
     }
 
-    @ExceptionHandler(value = ChatRuntimeException.class)
-    public void exceptionHandler(ChatRuntimeException e) throws IOException {
-        ChatResult<Void> result = ChatResult.failure(e.getCode(), e.getMessage());
-        ObjectMapper objectMapper = new ObjectMapper();
-        e.getSession().sendMessage(new TextMessage(objectMapper.writeValueAsString(result)));
+    @ExceptionHandler(value = WSRuntimeException.class)
+    public void exceptionHandler(WSRuntimeException e) throws IOException {
+        if (null != e.getSession() && e.getSession().isOpen()) {
+            ChatResult<Void> result = ChatResult.failure(e.getCode(), e.getMessage());
+            ObjectMapper objectMapper = new ObjectMapper();
+            e.getSession().sendMessage(new TextMessage(objectMapper.writeValueAsString(result)));
+        }
     }
 
     @ExceptionHandler(value = Exception.class)

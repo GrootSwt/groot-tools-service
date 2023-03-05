@@ -1,6 +1,6 @@
 package com.chat.business.config;
 
-import com.chat.business.ws.ChatHandler;
+import com.chat.business.ws.MemorandumHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -11,18 +11,18 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    private final ChatHandler chatHandler;
+    private final MemorandumHandler memorandumHandler;
 
     private final WebSocketInterceptor webSocketInterceptor;
 
     @Autowired
-    public WebSocketConfig(ChatHandler chatHandler, WebSocketInterceptor webSocketInterceptor) {
-        this.chatHandler = chatHandler;
+    public WebSocketConfig(MemorandumHandler memorandumHandler, WebSocketInterceptor webSocketInterceptor) {
+        this.memorandumHandler = memorandumHandler;
         this.webSocketInterceptor = webSocketInterceptor;
     }
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(chatHandler, "/ws/chat")
+        registry.addHandler(memorandumHandler, "/ws/memorandum")
                 .addInterceptors(webSocketInterceptor)
                 .setAllowedOrigins("*");
     }
