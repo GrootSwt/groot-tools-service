@@ -42,7 +42,7 @@ public class MemorandumHandler implements WebSocketHandler {
         HttpHeaders handshakeHeaders = session.getHandshakeHeaders();
         List<String> protocols = handshakeHeaders.get("Sec-WebSocket-Protocol");
         if (null != protocols && !protocols.isEmpty()) {
-            JWTUtil.verifyToken(protocols.get(0), true, session);
+            JWTUtil.verifyToken(protocols.get(0), session);
             sessions.add(session);
             sessionNumber.addAndGet(1);
             log.info("连接成功，当前连接数：" + sessionNumber.get());
@@ -122,7 +122,7 @@ public class MemorandumHandler implements WebSocketHandler {
         HttpHeaders handshakeHeaders = session.getHandshakeHeaders();
         List<String> protocols = handshakeHeaders.get("Sec-WebSocket-Protocol");
         if (null != protocols && !protocols.isEmpty()) {
-            User user = JWTUtil.verifyToken(protocols.get(0), true, session);
+            User user = JWTUtil.verifyToken(protocols.get(0), session);
             if (StringUtils.hasText(user.getId()) && StringUtils.hasText(user.getUsername())) {
                 return user;
             }

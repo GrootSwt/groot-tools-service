@@ -12,6 +12,8 @@ import com.chat.base.exception.WSRuntimeException;
 import com.chat.business.model.User;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.util.Date;
+
 public class JWTUtil {
 
     public static String getToken(User user) {
@@ -20,6 +22,7 @@ public class JWTUtil {
             return JWT.create()
                     .withClaim("username", user.getUsername())
                     .withClaim("id", user.getId())
+                    .withIssuedAt(new Date())
                     .sign(algorithm);
         }catch (JWTCreationException e) {
             e.printStackTrace();
@@ -27,7 +30,7 @@ public class JWTUtil {
         }
     }
 
-    public static User verifyToken(String token, boolean isWS, WebSocketSession session) {
+    public static User verifyToken(String token, WebSocketSession session) {
         try {
             Algorithm algorithm = Algorithm.HMAC256("chat");
             JWTVerifier jwtVerifier = JWT.require(algorithm)
