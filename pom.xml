@@ -8,11 +8,11 @@
         <version>3.0.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.chat</groupId>
-    <artifactId>chat-service</artifactId>
+    <groupId>com.groot</groupId>
+    <artifactId>groot-tools-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>chat-service</name>
-    <description>chat-service</description>
+    <name>groot-tools-service</name>
+    <description>groot-tools-service</description>
     <properties>
         <java.version>17</java.version>
     </properties>
@@ -78,7 +78,7 @@
     </profiles>
 
     <build>
-        <finalName>chat-service</finalName>
+        <finalName>groot-tools-service</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources/config</directory>
