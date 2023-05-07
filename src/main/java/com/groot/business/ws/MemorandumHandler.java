@@ -105,7 +105,7 @@ public class MemorandumHandler implements WebSocketHandler {
                 }
             }
             sessionNumber.set(sessions.size());
-            log.info("心跳检测后链接数量：" + sessions.size());
+            log.info("心跳检测后连接数量：" + sessions.size());
         }
     }
 
