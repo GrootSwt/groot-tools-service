@@ -1,6 +1,6 @@
 package com.groot.business.bean.result;
 
-import com.groot.base.bean.result.BaseResult;
+import com.groot.base.bean.result.BaseResponse;
 import com.groot.business.bean.MemorandumOperationType;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +9,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class MemorandumResult<T> extends BaseResult {
+public class MemorandumResult<T> extends BaseResponse {
 
     private Integer code = 200;
 

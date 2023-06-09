@@ -61,10 +61,10 @@ public class MemorandumHandler implements WebSocketHandler {
                 log.info("备忘录内容：" + message.getPayload());
                 data.setUserId(user.getId());
                 memorandumService.save(data);
-                log.info(user.getUsername() + "群发备忘录：" + message.getPayload());
+                log.info(user.getAccount() + "群发备忘录：" + message.getPayload());
                 sessions.forEach(s -> {
                     try {
-                        if (getUserFromProtocols(s).getUsername().equals(user.getUsername())) {
+                        if (getUserFromProtocols(s).getAccount().equals(user.getAccount())) {
                             s.sendMessage(new TextMessage(objectMapper.writeValueAsString(MemorandumResult.success(MemorandumOperationType.append, "群发消息", data))));
                         }
                     } catch (IOException e) {
@@ -123,7 +123,7 @@ public class MemorandumHandler implements WebSocketHandler {
         List<String> protocols = handshakeHeaders.get("Sec-WebSocket-Protocol");
         if (null != protocols && !protocols.isEmpty()) {
             User user = JWTUtil.verifyToken(protocols.get(0), session);
-            if (StringUtils.hasText(user.getId()) && StringUtils.hasText(user.getUsername())) {
+            if (StringUtils.hasText(user.getId()) && StringUtils.hasText(user.getAccount())) {
                 return user;
             }
         }

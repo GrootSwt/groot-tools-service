@@ -12,7 +12,7 @@ public class JWTTest {
     public void testVerify() {
         User user = new User();
         user.setId("1");
-        user.setUsername("test1");
+        user.setAccount("test1");
         String token = JWTUtil.getToken(user);
         System.out.println(token);
     }

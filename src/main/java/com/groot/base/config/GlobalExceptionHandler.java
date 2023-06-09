@@ -1,7 +1,7 @@
 package com.groot.base.config;
 
-import com.groot.base.bean.result.BaseResult;
-import com.groot.base.bean.result.Result;
+import com.groot.base.bean.result.BaseResponse;
+import com.groot.base.bean.result.Response;
 import com.groot.business.bean.result.MemorandumResult;
 import com.groot.base.exception.BusinessRuntimeException;
 import com.groot.base.exception.WSRuntimeException;
@@ -32,14 +32,14 @@ public class GlobalExceptionHandler {
      * @return Result.failure(异常信息)
      */
     @ExceptionHandler(value = BusinessRuntimeException.class)
-    public BaseResult exceptionHandler(HttpServletResponse response, BusinessRuntimeException e) {
+    public BaseResponse exceptionHandler(HttpServletResponse response, BusinessRuntimeException e) {
         e.printStackTrace();
         response.setStatus(e.getStatus());
-        return BaseResult.failure(e.getMessage());
+        return BaseResponse.failure(e.getMessage());
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public BaseResult exceptionHandler(HttpServletResponse response, MethodArgumentNotValidException e) {
+    public BaseResponse exceptionHandler(HttpServletResponse response, MethodArgumentNotValidException e) {
         e.printStackTrace();
         response.setStatus(400);
         int errorCount = e.getBindingResult().getErrorCount();
@@ -52,9 +52,9 @@ public class GlobalExceptionHandler {
                     message.append("\n");
                 }
             }
-            return Result.failure(message.toString());
+            return Response.failure(message.toString());
         }
-        return BaseResult.failure(e.getMessage());
+        return BaseResponse.failure(e.getMessage());
     }
 
     @ExceptionHandler(value = WSRuntimeException.class)
@@ -67,10 +67,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = Exception.class)
-    public BaseResult exceptionHandler(HttpServletResponse response, Exception e) {
+    public BaseResponse exceptionHandler(HttpServletResponse response, Exception e) {
         e.printStackTrace();
         response.setStatus(400);
-        return BaseResult.failure("服务器出现异常");
+        return BaseResponse.failure("服务器出现异常");
     }
 }
 

@@ -1,6 +1,6 @@
 package com.groot.business.controller;
 
-import com.groot.base.bean.result.ListResult;
+import com.groot.base.bean.result.ListResponse;
 import com.groot.business.model.User;
 import com.groot.business.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +22,11 @@ public class UserController {
     }
 
     @GetMapping
-    public ListResult<User> selectAll() {
+    public ListResponse<User> selectAll() {
         List<User> users = userService.list();
         users.forEach(user -> {
             user.setPassword(null);
         });
-        return ListResult.success("获取用户列表成功", users);
+        return ListResponse.success("获取用户列表成功", users);
     }
 }

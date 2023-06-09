@@ -1,7 +1,7 @@
 package com.groot.business.controller;
 
-import com.groot.base.bean.result.BaseResult;
-import com.groot.base.bean.result.ListResult;
+import com.groot.base.bean.result.BaseResponse;
+import com.groot.base.bean.result.ListResponse;
 import com.groot.business.model.Memorandum;
 import com.groot.business.service.MemorandumService;
 import jakarta.validation.constraints.NotBlank;
@@ -23,16 +23,16 @@ public class MemorandumController {
     }
 
     @GetMapping(value = "/{userId}/listMemorandumByUserId")
-    public ListResult<Memorandum> listMessageByUserId(@NotBlank(message = "用户ID不可为空") @PathVariable String userId) {
+    public ListResponse<Memorandum> listMessageByUserId(@NotBlank(message = "用户ID不可为空") @PathVariable String userId){
         List<Memorandum> memorandums = memorandumService.listByUserId(userId);
-        return ListResult.success("获取备忘录列表成功！", memorandums);
+        return ListResponse.success("获取备忘录列表成功！", memorandums);
     }
 
     @DeleteMapping(value = "{id}/{userId}/deleteMemorandumById")
-    public BaseResult deleteMessageById(@NotBlank(message = "备忘录ID不可为空") @PathVariable String id,
-                                        @NotBlank(message = "用户ID不可为空") @PathVariable String userId) throws IOException {
+    public BaseResponse deleteMessageById(@NotBlank(message = "备忘录ID不可为空") @PathVariable String id,
+                                          @NotBlank(message = "用户ID不可为空") @PathVariable String userId) throws IOException {
         memorandumService.deleteMessageById(id, userId);
-        return BaseResult.success("删除成功");
+        return BaseResponse.success("删除成功");
     }
 
 }

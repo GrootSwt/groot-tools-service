@@ -1,6 +1,6 @@
 package com.groot.business.controller;
 
-import com.groot.base.bean.result.BaseResult;
+import com.groot.base.bean.result.BaseResponse;
 import com.groot.base.exception.BusinessRuntimeException;
 import com.groot.business.utils.JWTUtil;
 import com.groot.business.model.User;
@@ -12,6 +12,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.concurrent.TimeUnit;
 
 @RestController
 public class LoginController {
@@ -25,7 +27,7 @@ public class LoginController {
     }
 
     @PostMapping(value = "/login")
-    public BaseResult login(@Validated @RequestBody User user, HttpServletResponse response) {
+    public BaseResponse login(@Validated @RequestBody User user, HttpServletResponse response) {
         User result = userService.getUser(user);
         if (null == result) {
             throw new BusinessRuntimeException("账号或密码不正确");
@@ -39,6 +41,6 @@ public class LoginController {
         userIdCookie.setPath("/");
         response.addCookie(userIdCookie);
 
-        return BaseResult.success("登陆成功");
+        return BaseResponse.success("登陆成功");
     }
 }

@@ -20,7 +20,7 @@ public class JWTUtil {
         try {
             Algorithm algorithm = Algorithm.HMAC256("memorandum");
             return JWT.create()
-                    .withClaim("username", user.getUsername())
+                    .withClaim("account", user.getAccount())
                     .withClaim("id", user.getId())
                     .withIssuedAt(new Date())
                     .sign(algorithm);
@@ -36,11 +36,11 @@ public class JWTUtil {
             JWTVerifier jwtVerifier = JWT.require(algorithm)
                     .build();
             DecodedJWT decodedJWT = jwtVerifier.verify(token);
-            Claim username = decodedJWT.getClaim("username");
+            Claim account = decodedJWT.getClaim("account");
             Claim id = decodedJWT.getClaim("id");
             User user = new User();
             user.setId(id.asString());
-            user.setUsername(username.asString());
+            user.setAccount(account.asString());
             return user;
         }catch (JWTVerificationException e) {
             e.printStackTrace();
@@ -54,11 +54,11 @@ public class JWTUtil {
             JWTVerifier jwtVerifier = JWT.require(algorithm)
                     .build();
             DecodedJWT decodedJWT = jwtVerifier.verify(token);
-            Claim username = decodedJWT.getClaim("username");
+            Claim account = decodedJWT.getClaim("account");
             Claim id = decodedJWT.getClaim("id");
             User user = new User();
             user.setId(id.asString());
-            user.setUsername(username.asString());
+            user.setAccount(account.asString());
             return user;
         }catch (JWTVerificationException e) {
             e.printStackTrace();

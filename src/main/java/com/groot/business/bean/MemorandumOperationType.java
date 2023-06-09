@@ -12,7 +12,7 @@ public enum MemorandumOperationType {
 
     private final String value;
 
-    private MemorandumOperationType(String value) {
+    MemorandumOperationType(String value) {
         this.value = value;
     }
 

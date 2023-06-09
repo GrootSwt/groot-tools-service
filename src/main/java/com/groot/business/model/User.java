@@ -10,11 +10,15 @@ import org.hibernate.validator.constraints.Length;
 @Data
 public class User extends BaseModel {
 
-    @NotBlank(message = "用户名不可为空")
-    @Length(min = 2, max = 20, message = "用户名长度位于2-20之间")
-    private String username;
+    @NotBlank(message = "账号不可为空")
+    @Length(min = 2, max = 20, message = "账号长度位于2-20之间")
+    private String account;
 
     @NotBlank(message = "密码不可为空")
     @Length(min = 6, max = 20, message = "密码长度位于6-20之间")
     private String password;
+
+    private String displayName;
+
+    private String phoneNumber;
 }
