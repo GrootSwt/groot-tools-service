@@ -24,9 +24,7 @@ public class UserController {
     @GetMapping
     public ListResponse<User> selectAll() {
         List<User> users = userService.list();
-        users.forEach(user -> {
-            user.setPassword(null);
-        });
+        users.forEach(user -> user.setPassword(null));
         return ListResponse.success("获取用户列表成功", users);
     }
 }

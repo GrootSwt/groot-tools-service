@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.groot.business.mapper.MessageMapper">
+    <select id="listMessageBySenderIdAndReceiverId" resultType="com.groot.business.dto.MessageDTO">
+        select m.id,
+               m.sender_id,
+               m.receiver_id,
+               m.read_status,
+               m.content
+        from message m
+        where (m.sender_id = #{senderId} and m.receiver_id = #{receiverId})
+           or (m.sender_id = #{receiverId} and m.receiver_id = #{senderId})
+        order by m.create_time
+    </select>
+    <update id="updateMessageRead">
+        update message m
+        set m.read_status = 'read'
+        where m.sender_id = #{senderId}
+          and m.receiver_id = #{receiverId}
+          and m.read_status = 'unread'
+    </update>
+</mapper>

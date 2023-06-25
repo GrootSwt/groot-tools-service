@@ -2,17 +2,30 @@ package com.groot.business.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public enum MemorandumOperationType {
+public enum MemorandumOperationTypeEnum {
+    /**
+     * 拼接
+     */
     @JsonProperty(value = "append")
-    append("append"),
+    APPEND("append"),
+    /**
+     * 替换
+     */
     @JsonProperty(value = "replace")
-    replace("replace"),
+    REPLACE("replace"),
+    /**
+     * 增加
+     */
+    ADD("add"),
+    /**
+     * 心跳检测
+     */
     @JsonProperty(value = "heartbeat")
-    heartbeat("heartbeat");
+    HEARTBEAT("heartbeat");
 
     private final String value;
 
-    MemorandumOperationType(String value) {
+    MemorandumOperationTypeEnum(String value) {
         this.value = value;
     }
 

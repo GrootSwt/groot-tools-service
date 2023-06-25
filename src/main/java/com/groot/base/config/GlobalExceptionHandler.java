@@ -2,12 +2,11 @@ package com.groot.base.config;
 
 import com.groot.base.bean.result.BaseResponse;
 import com.groot.base.bean.result.Response;
-import com.groot.business.bean.result.MemorandumResult;
+import com.groot.base.bean.result.ws.WSResponse;
 import com.groot.base.exception.BusinessRuntimeException;
 import com.groot.base.exception.WSRuntimeException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -23,7 +22,6 @@ import java.util.List;
  */
 @ControllerAdvice
 @RestController
-@Slf4j
 public class GlobalExceptionHandler {
     /**
      * 全局异常处理器
@@ -60,16 +58,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = WSRuntimeException.class)
     public void exceptionHandler(WSRuntimeException e) throws IOException {
         if (null != e.getSession() && e.getSession().isOpen()) {
-            MemorandumResult<Void> result = MemorandumResult.failure(e.getCode(), e.getMessage());
+            WSResponse<?, ?> response = WSResponse.failure(e.getCode(), e.getMessage());
             ObjectMapper objectMapper = new ObjectMapper();
-            e.getSession().sendMessage(new TextMessage(objectMapper.writeValueAsString(result)));
+            e.getSession().sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
         }
     }
 
     @ExceptionHandler(value = Exception.class)
     public BaseResponse exceptionHandler(HttpServletResponse response, Exception e) {
         e.printStackTrace();
-        response.setStatus(400);
+        response.setStatus(500);
         return BaseResponse.failure("服务器出现异常");
     }
 }

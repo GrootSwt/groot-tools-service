@@ -19,5 +19,5 @@ public class BaseModel {
 
     @TableLogic
     @TableField(fill = FieldFill.INSERT)
-    private Integer deleted;
+    private Boolean deleted;
 }

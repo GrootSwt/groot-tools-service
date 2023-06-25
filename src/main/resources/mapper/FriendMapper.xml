@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.groot.business.mapper.FriendMapper">
+    <resultMap id="friend" type="com.groot.business.dto.FriendDTO">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId"/>
+        <result column="friend_id" property="friendId" />
+        <result column="account" property="account"/>
+        <result column="display_name" property="displayName" />
+        <result column="phone_number" property="phoneNumber" />
+        <result column="comment_name" property="commentName" />
+    </resultMap>
+    <select id="listFriend" resultMap="friend">
+        select f.id,
+               f.user_id,
+               f.friend_id,
+               u.account,
+               u.display_name,
+               u.phone_number,
+               f.comment_name
+        from `groot-tools`.friend f
+                 join `groot-tools`.user u
+                      on f.friend_id = u.id
+        where f.user_id = #{userId}
+          and f.relation_status = #{relationStatus}
+          and f.deleted = 0
+          and u.deleted = 0
+    </select>
+    <select id="listFriendWithUnreadMsgCount" resultType="com.groot.business.dto.FriendWithUnreadMsgCountDTO">
+        select f.id,
+               f.user_id,
+               f.friend_id,
+               u.account,
+               u.display_name,
+               u.phone_number,
+               f.comment_name,
+               m.unread_message_count
+        from `groot-tools`.user u,
+             `groot-tools`.friend f
+                 left join (select count(m.receiver_id) as unread_message_count,
+                                   m.sender_id,
+                                   m.receiver_id
+                            from `groot-tools`.message m
+                            where m.receiver_id = #{userId}
+                              and m.read_status = #{readStatus}
+                            group by sender_id, receiver_id) as m on f.friend_id = m.sender_id and f.user_id = m.receiver_id
+        where f.friend_id = u.id
+          and f.user_id = #{userId}
+          and f.relation_status = #{relationStatus}
+          and f.deleted = 0
+          and u.deleted = 0
+        order by m.unread_message_count desc
+    </select>
+</mapper>

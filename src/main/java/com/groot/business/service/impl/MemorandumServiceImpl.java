@@ -22,7 +22,6 @@ public class MemorandumServiceImpl implements MemorandumService {
         this.memorandumMapper = memorandumMapper;
     }
 
-
     @Override
     public List<Memorandum> listByUserId(String userId) {
         QueryWrapper<Memorandum> wrapper = new QueryWrapper<>();

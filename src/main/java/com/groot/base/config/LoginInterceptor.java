@@ -1,5 +1,6 @@
 package com.groot.base.config;
 
+import com.groot.base.bean.CurrentUser;
 import com.groot.base.exception.BusinessRuntimeException;
 import com.groot.business.model.User;
 import com.groot.business.utils.JWTUtil;
@@ -12,6 +13,12 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
+
+    private final CurrentUserStore currentUserStore;
+
+    public LoginInterceptor(final CurrentUserStore currentUserStore) {
+        this.currentUserStore = currentUserStore;
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -31,6 +38,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             if (!userId.equals("") && !token.equals("")) {
                 User user = JWTUtil.verifyToken(token);
                 if (userId.equals(user.getId())) {
+                    currentUserStore.setCurrentUser(new CurrentUser(userId));
                     return  true;
                 }
             }
@@ -45,6 +53,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        currentUserStore.removeCurrentUser();
         HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
     }
 }

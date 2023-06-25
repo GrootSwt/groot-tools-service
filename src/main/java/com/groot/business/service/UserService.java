@@ -9,4 +9,6 @@ public interface UserService {
     List<User> list();
 
     User getUser(User user);
+
+    void  checkLoginStatus();
 }

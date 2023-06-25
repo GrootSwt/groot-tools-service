@@ -3,52 +3,51 @@ package com.groot.business.ws;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.groot.base.bean.result.ws.WSRequest;
-import com.groot.base.bean.result.ws.WSResponse;
-import com.groot.business.bean.MemorandumOperationTypeEnum;
-import com.groot.business.model.Memorandum;
+import com.groot.business.bean.ChatOperationTypeEnum;
 import com.groot.business.model.User;
 import com.groot.business.utils.JWTUtil;
 import com.groot.business.utils.WSUtil;
-import com.groot.business.ws.handler.MemorandumAppendHandler;
+import com.groot.business.ws.handler.SendMessageHandler;
+import com.groot.business.ws.handler.UpdateMessageToReadHandler;
 
+import io.micrometer.common.lang.NonNullApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * 多端长连接备忘录
- */
 @Slf4j
 @Component
-public class MemorandumHandler implements WebSocketHandler {
+@NonNullApi
+public class ChatHandler implements WebSocketHandler {
 
     private static final AtomicInteger sessionNumber = new AtomicInteger(0);
-
     private static final CopyOnWriteArraySet<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
 
-    private final MemorandumAppendHandler memorandumAppendHandler;
+    private final SendMessageHandler sendMessageHandler;
+    private final UpdateMessageToReadHandler updateMessageToReadHandler;
 
     @Autowired
-    public MemorandumHandler(final MemorandumAppendHandler memorandumAppendHandler) {
-        this.memorandumAppendHandler = memorandumAppendHandler;
+    public ChatHandler(final UpdateMessageToReadHandler updateMessageToReadHandler,
+            SendMessageHandler sendMessageHandler) {
+        this.updateMessageToReadHandler = updateMessageToReadHandler;
+        this.sendMessageHandler = sendMessageHandler;
     }
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+    public void afterConnectionEstablished(WebSocketSession session) {
         HttpHeaders handshakeHeaders = session.getHandshakeHeaders();
         List<String> protocols = handshakeHeaders.get("Sec-WebSocket-Protocol");
         if (null != protocols && !protocols.isEmpty()) {
             JWTUtil.verifyToken(protocols.get(0), session);
             sessions.add(session);
             sessionNumber.addAndGet(1);
-            log.info("备忘录服务连接成功，当前连接数：" + sessionNumber.get());
+            log.info("聊天服务连接成功，当前连接数：" + sessionNumber.get());
         }
     }
 
@@ -56,20 +55,26 @@ public class MemorandumHandler implements WebSocketHandler {
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         User user = WSUtil.getUserFromProtocols(session);
         if (message.getPayload() instanceof String) {
-            if (MemorandumOperationTypeEnum.HEARTBEAT.getValue().equals(message.getPayload())) {
-                log.info("备忘录客户端<" + user.getAccount() + ">心跳检测");
+            // 客户端心跳检测
+            if (ChatOperationTypeEnum.HEARTBEAT.getValue().equals(message.getPayload())) {
+                log.info("聊天客户端<" + user.getAccount() + ">心跳检测");
                 session.sendMessage(message);
             } else {
                 ObjectMapper objectMapper = new ObjectMapper();
-                WSRequest<MemorandumOperationTypeEnum, ?> request = objectMapper.readValue(
-                        (String) message.getPayload(), new TypeReference<WSRequest<MemorandumOperationTypeEnum, ?>>() {
-                        });
-                // 追加
-                if (MemorandumOperationTypeEnum.APPEND.getValue().equals(request.getOperationType().getValue())) {
-                    memorandumAppendHandler.handler(user, session, message, sessions);
+                WSRequest<ChatOperationTypeEnum, ?> requestTemp = objectMapper.readValue(
+                        (String) message.getPayload(),
+                        new TypeReference<WSRequest<ChatOperationTypeEnum, ?>>(){}
+                        );
+                // 消息已读
+                if (ChatOperationTypeEnum.READ.equals(requestTemp.getOperationType())) {
+                    updateMessageToReadHandler.handler(session, message, sessions);
                 }
-            }
+                // 发送消息
+                if (ChatOperationTypeEnum.SEND.equals(requestTemp.getOperationType())) {
+                    sendMessageHandler.handler(session, message, sessions);
+                }
 
+            }
         }
     }
 
@@ -82,7 +87,7 @@ public class MemorandumHandler implements WebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         sessions.remove(session);
         sessionNumber.addAndGet(-1);
-        log.info("备忘录服务断开连接，当前连接数：" + sessionNumber.get());
+        log.info("聊天服务断开连接，当前连接数：" + sessionNumber.get());
     }
 
     @Override
@@ -91,17 +96,6 @@ public class MemorandumHandler implements WebSocketHandler {
     }
 
     public static void heartbeat() {
-        WSUtil.heartbeat(sessions, sessionNumber, "备忘录服务");
+        WSUtil.heartbeat(sessions, sessionNumber, "聊天服务");
     }
-
-    public static void sendAll(String userId, List<Memorandum> memorandums) throws IOException {
-        for (WebSocketSession session : sessions) {
-            if (WSUtil.getUserFromProtocols(session).getId().equals(userId)) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                session.sendMessage(new TextMessage(objectMapper.writeValueAsString(
-                        WSResponse.success("获取消息列表成功", MemorandumOperationTypeEnum.REPLACE, memorandums))));
-            }
-        }
-    }
-
 }
