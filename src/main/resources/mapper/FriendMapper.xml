@@ -20,8 +20,8 @@
                u.display_name,
                u.phone_number,
                f.comment_name
-        from `groot-tools`.friend f
-                 join `groot-tools`.user u
+        from friend f
+                 join user u
                       on f.friend_id = u.id
         where f.user_id = #{userId}
           and f.relation_status = #{relationStatus}
@@ -37,12 +37,12 @@
                u.phone_number,
                f.comment_name,
                m.unread_message_count
-        from `groot-tools`.user u,
-             `groot-tools`.friend f
+        from user u,
+             friend f
                  left join (select count(m.receiver_id) as unread_message_count,
                                    m.sender_id,
                                    m.receiver_id
-                            from `groot-tools`.message m
+                            from message m
                             where m.receiver_id = #{userId}
                               and m.read_status = #{readStatus}
                             group by sender_id, receiver_id) as m on f.friend_id = m.sender_id and f.user_id = m.receiver_id

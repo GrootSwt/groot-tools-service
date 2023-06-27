@@ -2,7 +2,6 @@ package com.groot.business.config;
 
 import com.groot.business.ws.ChatHandler;
 import com.groot.business.ws.MemorandumHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -18,7 +17,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     private final WebSocketInterceptor webSocketInterceptor;
 
-    @Autowired
     public WebSocketConfig(final MemorandumHandler memorandumHandler, final WebSocketInterceptor webSocketInterceptor, final ChatHandler chatHandler) {
         this.memorandumHandler = memorandumHandler;
         this.chatHandler = chatHandler;

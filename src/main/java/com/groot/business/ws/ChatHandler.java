@@ -5,14 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.groot.base.bean.result.ws.WSRequest;
 import com.groot.business.bean.ChatOperationTypeEnum;
 import com.groot.business.model.User;
-import com.groot.business.utils.JWTUtil;
 import com.groot.business.utils.WSUtil;
 import com.groot.business.ws.handler.SendMessageHandler;
 import com.groot.business.ws.handler.UpdateMessageToReadHandler;
 
 import io.micrometer.common.lang.NonNullApi;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
@@ -32,7 +30,6 @@ public class ChatHandler implements WebSocketHandler {
     private final SendMessageHandler sendMessageHandler;
     private final UpdateMessageToReadHandler updateMessageToReadHandler;
 
-    @Autowired
     public ChatHandler(final UpdateMessageToReadHandler updateMessageToReadHandler,
             SendMessageHandler sendMessageHandler) {
         this.updateMessageToReadHandler = updateMessageToReadHandler;
@@ -44,7 +41,6 @@ public class ChatHandler implements WebSocketHandler {
         HttpHeaders handshakeHeaders = session.getHandshakeHeaders();
         List<String> protocols = handshakeHeaders.get("Sec-WebSocket-Protocol");
         if (null != protocols && !protocols.isEmpty()) {
-            JWTUtil.verifyToken(protocols.get(0), session);
             sessions.add(session);
             sessionNumber.addAndGet(1);
             log.info("聊天服务连接成功，当前连接数：" + sessionNumber.get());

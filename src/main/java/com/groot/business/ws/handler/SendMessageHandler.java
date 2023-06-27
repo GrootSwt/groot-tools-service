@@ -11,7 +11,6 @@ import com.groot.business.service.MessageService;
 import com.groot.business.utils.WSUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
@@ -26,7 +25,6 @@ public class SendMessageHandler {
 
     private final MessageService messageService;
 
-    @Autowired
     public SendMessageHandler(final MessageService messageService) {
         this.messageService = messageService;
     }

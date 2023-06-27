@@ -5,7 +5,9 @@ import com.groot.business.mapper.MemorandumMapper;
 import com.groot.business.model.Memorandum;
 import com.groot.business.service.MemorandumService;
 import com.groot.business.ws.MemorandumHandler;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import cn.dev33.satoken.stp.StpUtil;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,14 +19,14 @@ public class MemorandumServiceImpl implements MemorandumService {
 
     private final MemorandumMapper memorandumMapper;
 
-    @Autowired
     public MemorandumServiceImpl(MemorandumMapper memorandumMapper) {
         this.memorandumMapper = memorandumMapper;
     }
 
     @Override
-    public List<Memorandum> listByUserId(String userId) {
+    public List<Memorandum> list() {
         QueryWrapper<Memorandum> wrapper = new QueryWrapper<>();
+        String userId = StpUtil.getLoginIdAsString();
         wrapper.eq("user_id", userId);
         wrapper.orderByAsc("create_time");
         return memorandumMapper.selectList(wrapper);
@@ -37,11 +39,11 @@ public class MemorandumServiceImpl implements MemorandumService {
     }
 
     @Override
-    public void deleteMessageById(String id, String userId) throws IOException {
+    public void deleteById(String id) throws IOException {
         Memorandum memorandum = new Memorandum();
         memorandum.setId(id);
         memorandumMapper.deleteById(memorandum);
-        List<Memorandum> memorandums = this.listByUserId(userId);
-        MemorandumHandler.sendAll(userId, memorandums);
+        List<Memorandum> memorandums = this.list();
+        MemorandumHandler.sendAll(memorandums);
     }
 }

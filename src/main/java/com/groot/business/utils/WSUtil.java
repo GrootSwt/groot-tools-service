@@ -3,6 +3,8 @@ package com.groot.business.utils;
 import com.groot.base.exception.WSRuntimeException;
 import com.groot.business.bean.MemorandumOperationTypeEnum;
 import com.groot.business.model.User;
+
+import cn.dev33.satoken.stp.StpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.StringUtils;
@@ -22,7 +24,11 @@ public class WSUtil {
         HttpHeaders handshakeHeaders = session.getHandshakeHeaders();
         List<String> protocols = handshakeHeaders.get("Sec-WebSocket-Protocol");
         if (null != protocols && !protocols.isEmpty()) {
-            User user = JWTUtil.verifyToken(protocols.get(0), session);
+            String id = (String) StpUtil.getExtra(protocols.get(0), "id");
+            String account = (String) StpUtil.getExtra(protocols.get(0), "account");
+            User user = new User();
+            user.setId(id);
+            user.setAccount(account);
             if (StringUtils.hasText(user.getId()) && StringUtils.hasText(user.getAccount())) {
                 return user;
             }
@@ -30,7 +36,8 @@ public class WSUtil {
         throw new WSRuntimeException(401, session, "用户信息校验失败");
     }
 
-    public static void heartbeat(CopyOnWriteArraySet<WebSocketSession> sessions, AtomicInteger sessionNumber, String wsName) {
+    public static void heartbeat(CopyOnWriteArraySet<WebSocketSession> sessions, AtomicInteger sessionNumber,
+            String wsName) {
         if (!sessions.isEmpty()) {
             Iterator<WebSocketSession> iterator = sessions.iterator();
             log.info(wsName + "心跳检测前连接数量：" + sessions.size());

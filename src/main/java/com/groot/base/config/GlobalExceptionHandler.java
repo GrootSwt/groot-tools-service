@@ -5,6 +5,9 @@ import com.groot.base.bean.result.Response;
 import com.groot.base.bean.result.ws.WSResponse;
 import com.groot.base.exception.BusinessRuntimeException;
 import com.groot.base.exception.WSRuntimeException;
+
+import cn.dev33.satoken.exception.NotLoginException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.validation.ObjectError;
@@ -62,6 +65,13 @@ public class GlobalExceptionHandler {
             ObjectMapper objectMapper = new ObjectMapper();
             e.getSession().sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
         }
+    }
+
+    @ExceptionHandler(value = NotLoginException.class)
+    public BaseResponse exceptionHandler(HttpServletResponse response, NotLoginException e) {
+        e.printStackTrace();
+        response.setStatus(401);
+        return BaseResponse.failure("登陆状态异常，请重新登录");
     }
 
     @ExceptionHandler(value = Exception.class)

@@ -7,12 +7,11 @@ import com.groot.base.bean.result.ws.WSResponse;
 import com.groot.business.bean.MemorandumOperationTypeEnum;
 import com.groot.business.model.Memorandum;
 import com.groot.business.model.User;
-import com.groot.business.utils.JWTUtil;
 import com.groot.business.utils.WSUtil;
 import com.groot.business.ws.handler.MemorandumAppendHandler;
 
+import cn.dev33.satoken.stp.StpUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
@@ -35,7 +34,6 @@ public class MemorandumHandler implements WebSocketHandler {
 
     private final MemorandumAppendHandler memorandumAppendHandler;
 
-    @Autowired
     public MemorandumHandler(final MemorandumAppendHandler memorandumAppendHandler) {
         this.memorandumAppendHandler = memorandumAppendHandler;
     }
@@ -45,7 +43,6 @@ public class MemorandumHandler implements WebSocketHandler {
         HttpHeaders handshakeHeaders = session.getHandshakeHeaders();
         List<String> protocols = handshakeHeaders.get("Sec-WebSocket-Protocol");
         if (null != protocols && !protocols.isEmpty()) {
-            JWTUtil.verifyToken(protocols.get(0), session);
             sessions.add(session);
             sessionNumber.addAndGet(1);
             log.info("备忘录服务连接成功，当前连接数：" + sessionNumber.get());
@@ -94,7 +91,8 @@ public class MemorandumHandler implements WebSocketHandler {
         WSUtil.heartbeat(sessions, sessionNumber, "备忘录服务");
     }
 
-    public static void sendAll(String userId, List<Memorandum> memorandums) throws IOException {
+    public static void sendAll(List<Memorandum> memorandums) throws IOException {
+        String userId = StpUtil.getLoginIdAsString();
         for (WebSocketSession session : sessions) {
             if (WSUtil.getUserFromProtocols(session).getId().equals(userId)) {
                 ObjectMapper objectMapper = new ObjectMapper();

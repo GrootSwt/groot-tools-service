@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
@@ -28,7 +27,6 @@ public class UpdateMessageToReadHandler {
 
   private final MessageService messageService;
 
-  @Autowired
   public UpdateMessageToReadHandler(final MessageService messageService) {
     this.messageService = messageService;
   }
