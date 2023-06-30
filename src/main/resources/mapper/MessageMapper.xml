@@ -3,22 +3,59 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.groot.business.mapper.MessageMapper">
-    <select id="listMessageBySenderIdAndReceiverId" resultType="com.groot.business.dto.MessageDTO">
-        select m.id,
-               m.sender_id,
-               m.receiver_id,
-               m.read_status,
-               m.content
-        from message m
-        where (m.sender_id = #{senderId} and m.receiver_id = #{receiverId})
-           or (m.sender_id = #{receiverId} and m.receiver_id = #{senderId})
+    <select id="listMessage" resultType="com.groot.business.dto.MessageDTO">
+        select *
+        from (select m.id,
+                     m.sender_id,
+                     m.receiver_id,
+                     m.read_status,
+                     m.content,
+                     m.create_time
+              from message m
+              where (m.sender_id = #{senderId} and m.receiver_id = #{receiverId})
+                 or (m.sender_id = #{receiverId} and m.receiver_id = #{senderId})
+              order by m.create_time desc limit #{pageSize}
+              <if test="rowNumber != null">
+                  offset #{rowNumber}
+              </if>
+              ) m
         order by m.create_time
     </select>
-    <update id="updateMessageRead">
+    <select id="listUnreadMessageCount"
+            resultType="com.groot.business.dto.UnreadMessageCountDTO">
+        select m.sender_id,
+               m.receiver_id,
+               count(m.sender_id) as count
+        from
+            message m
+        where
+            (m.sender_id = #{friendId}
+          and m.receiver_id = #{userId}
+          and m.read_status = 'unread')
+           or (m.sender_id = #{userId}
+          and m.receiver_id = #{friendId}
+          and m.read_status = 'unread')
+        group by
+            m.sender_id,
+            m.receiver_id
+    </select>
+    <select id="listMessageRowNumberById" resultType="java.lang.Long">
+        select row_num
+        from (select m.id, row_number() over(order by m.create_time desc) row_num
+              from message m
+              where (m.sender_id = #{userId} and m.receiver_id = #{friendId})
+                 or (m.sender_id = #{friendId} and m.receiver_id = #{userId})) m
+        where m.id = #{prevMessageId}
+    </select>
+    <update id="updateMessageToRead">
         update message m
         set m.read_status = 'read'
-        where m.sender_id = #{senderId}
-          and m.receiver_id = #{receiverId}
-          and m.read_status = 'unread'
+        <where>
+            <foreach collection="unreadMessageIds" item="id" index="index" open="m.id in(" separator="," close=")">
+                #{id}
+            </foreach>
+            and m.sender_id = #{friendId}
+            and m.receiver_id = #{userId}
+        </where>
     </update>
 </mapper>

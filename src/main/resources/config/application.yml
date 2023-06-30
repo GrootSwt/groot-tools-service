@@ -4,6 +4,10 @@ server:
     session:
       timeout: 30s
 spring:
+  profiles:
+    active: @env@
+  jackson:
+    default-property-inclusion: non_null
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${application.datasource.url}
@@ -21,8 +25,6 @@ spring:
           max-wait: -1ms
           max-idle: 10
           min-idle: 0
-  profiles:
-    active: @env@
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
@@ -40,4 +42,4 @@ sa-token:
   is-concurrent: true
   is-share: false
   is-log: true
-  jwt-secret-key: dfakjsfhkljsadhflaksjfhasjkldfa
+  jwt-secret-key: ${application.sa-token.jwt-secret-key}

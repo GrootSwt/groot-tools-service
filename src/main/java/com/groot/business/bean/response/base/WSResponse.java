@@ -1,4 +1,4 @@
-package com.groot.base.bean.result.ws;
+package com.groot.business.bean.response.base;
 
 import lombok.Data;
 

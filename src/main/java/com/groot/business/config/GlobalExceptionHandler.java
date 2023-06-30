@@ -1,10 +1,9 @@
-package com.groot.base.config;
+package com.groot.business.config;
 
-import com.groot.base.bean.result.BaseResponse;
-import com.groot.base.bean.result.Response;
-import com.groot.base.bean.result.ws.WSResponse;
-import com.groot.base.exception.BusinessRuntimeException;
-import com.groot.base.exception.WSRuntimeException;
+import com.groot.business.bean.response.base.Response;
+import com.groot.business.bean.response.base.WSResponse;
+import com.groot.business.exception.BusinessRuntimeException;
+import com.groot.business.exception.WSRuntimeException;
 
 import cn.dev33.satoken.exception.NotLoginException;
 
@@ -33,14 +32,14 @@ public class GlobalExceptionHandler {
      * @return Result.failure(异常信息)
      */
     @ExceptionHandler(value = BusinessRuntimeException.class)
-    public BaseResponse exceptionHandler(HttpServletResponse response, BusinessRuntimeException e) {
+    public Response<Void> exceptionHandler(HttpServletResponse response, BusinessRuntimeException e) {
         e.printStackTrace();
         response.setStatus(e.getStatus());
-        return BaseResponse.failure(e.getMessage());
+        return Response.failure(e.getMessage());
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public BaseResponse exceptionHandler(HttpServletResponse response, MethodArgumentNotValidException e) {
+    public Response<Void> exceptionHandler(HttpServletResponse response, MethodArgumentNotValidException e) {
         e.printStackTrace();
         response.setStatus(400);
         int errorCount = e.getBindingResult().getErrorCount();
@@ -55,7 +54,7 @@ public class GlobalExceptionHandler {
             }
             return Response.failure(message.toString());
         }
-        return BaseResponse.failure(e.getMessage());
+        return Response.failure(e.getMessage());
     }
 
     @ExceptionHandler(value = WSRuntimeException.class)
@@ -68,17 +67,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = NotLoginException.class)
-    public BaseResponse exceptionHandler(HttpServletResponse response, NotLoginException e) {
+    public Response<Void> exceptionHandler(HttpServletResponse response, NotLoginException e) {
         e.printStackTrace();
         response.setStatus(401);
-        return BaseResponse.failure("登陆状态异常，请重新登录");
+        return Response.failure("登陆状态异常，请重新登录");
     }
 
     @ExceptionHandler(value = Exception.class)
-    public BaseResponse exceptionHandler(HttpServletResponse response, Exception e) {
+    public Response<Void> exceptionHandler(HttpServletResponse response, Exception e) {
         e.printStackTrace();
         response.setStatus(500);
-        return BaseResponse.failure("服务器出现异常");
+        return Response.failure("服务器出现异常");
     }
 }
 

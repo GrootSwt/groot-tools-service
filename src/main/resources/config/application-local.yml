@@ -12,4 +12,7 @@ application:
   redis:
     host: 127.0.0.1
     port: 6379
+  # sa-token配置
+  sa-token:
+    jwt-secret-key: uhqeiwfnw12qi32ofiqwoe12uhfiw
     

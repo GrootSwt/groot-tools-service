@@ -1,6 +1,6 @@
 package com.groot.business.controller;
 
-import com.groot.base.bean.result.Response;
+import com.groot.business.bean.response.base.Response;
 import com.groot.business.dto.FriendDTO;
 import com.groot.business.dto.FriendWithUnreadMsgCountDTO;
 import com.groot.business.service.FriendService;

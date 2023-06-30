@@ -2,7 +2,7 @@ package com.groot.business.ws;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.groot.base.bean.result.ws.WSRequest;
+import com.groot.business.bean.request.base.WSRequest;
 import com.groot.business.bean.ChatOperationTypeEnum;
 import com.groot.business.model.User;
 import com.groot.business.utils.WSUtil;
@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @Component
 @NonNullApi
-public class ChatHandler implements WebSocketHandler {
+public class Chat implements WebSocketHandler {
 
     private static final AtomicInteger sessionNumber = new AtomicInteger(0);
     private static final CopyOnWriteArraySet<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
@@ -30,8 +30,8 @@ public class ChatHandler implements WebSocketHandler {
     private final SendMessageHandler sendMessageHandler;
     private final UpdateMessageToReadHandler updateMessageToReadHandler;
 
-    public ChatHandler(final UpdateMessageToReadHandler updateMessageToReadHandler,
-            SendMessageHandler sendMessageHandler) {
+    public Chat(final UpdateMessageToReadHandler updateMessageToReadHandler,
+                SendMessageHandler sendMessageHandler) {
         this.updateMessageToReadHandler = updateMessageToReadHandler;
         this.sendMessageHandler = sendMessageHandler;
     }
@@ -43,7 +43,7 @@ public class ChatHandler implements WebSocketHandler {
         if (null != protocols && !protocols.isEmpty()) {
             sessions.add(session);
             sessionNumber.addAndGet(1);
-            log.info("聊天服务连接成功，当前连接数：" + sessionNumber.get());
+            log.info(WSUtil.getUserFromProtocols(session).getDisplayName() + " 聊天服务连接成功，当前连接数：" + sessionNumber.get());
         }
     }
 
@@ -53,14 +53,14 @@ public class ChatHandler implements WebSocketHandler {
         if (message.getPayload() instanceof String) {
             // 客户端心跳检测
             if (ChatOperationTypeEnum.HEARTBEAT.getValue().equals(message.getPayload())) {
-                log.info("聊天客户端<" + user.getAccount() + ">心跳检测");
+                log.info("聊天客户端<" + user.getDisplayName() + ">心跳检测");
                 session.sendMessage(message);
             } else {
                 ObjectMapper objectMapper = new ObjectMapper();
                 WSRequest<ChatOperationTypeEnum, ?> requestTemp = objectMapper.readValue(
                         (String) message.getPayload(),
-                        new TypeReference<WSRequest<ChatOperationTypeEnum, ?>>(){}
-                        );
+                        new TypeReference<>() {
+                        });
                 // 消息已读
                 if (ChatOperationTypeEnum.READ.equals(requestTemp.getOperationType())) {
                     updateMessageToReadHandler.handler(session, message, sessions);
@@ -83,7 +83,7 @@ public class ChatHandler implements WebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         sessions.remove(session);
         sessionNumber.addAndGet(-1);
-        log.info("聊天服务断开连接，当前连接数：" + sessionNumber.get());
+        log.info(WSUtil.getUserFromProtocols(session).getDisplayName() + " 聊天服务断开连接，当前连接数：" + sessionNumber.get());
     }
 
     @Override

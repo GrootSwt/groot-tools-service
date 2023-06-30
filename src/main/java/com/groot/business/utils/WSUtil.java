@@ -1,6 +1,6 @@
 package com.groot.business.utils;
 
-import com.groot.base.exception.WSRuntimeException;
+import com.groot.business.exception.WSRuntimeException;
 import com.groot.business.bean.MemorandumOperationTypeEnum;
 import com.groot.business.model.User;
 
@@ -24,11 +24,18 @@ public class WSUtil {
         HttpHeaders handshakeHeaders = session.getHandshakeHeaders();
         List<String> protocols = handshakeHeaders.get("Sec-WebSocket-Protocol");
         if (null != protocols && !protocols.isEmpty()) {
-            String id = (String) StpUtil.getExtra(protocols.get(0), "id");
+            Object loginId = StpUtil.getLoginIdByToken(protocols.get(0));
+            if (null == loginId) {
+                throw new WSRuntimeException(401, session, "用户信息校验失败");
+            }
+
+            String id = (String) loginId;
             String account = (String) StpUtil.getExtra(protocols.get(0), "account");
+            String displayName = (String) StpUtil.getExtra(protocols.get(0), "displayName");
             User user = new User();
             user.setId(id);
             user.setAccount(account);
+            user.setDisplayName(displayName);
             if (StringUtils.hasText(user.getId()) && StringUtils.hasText(user.getAccount())) {
                 return user;
             }

@@ -1,15 +1,14 @@
 package com.groot.business.controller;
 
-import com.groot.base.bean.result.BaseResponse;
-import com.groot.base.exception.BusinessRuntimeException;
+import com.groot.business.bean.response.base.Response;
 
 import cn.dev33.satoken.stp.SaLoginConfig;
 import cn.dev33.satoken.stp.StpUtil;
 
-import com.groot.business.model.User;
+import com.groot.business.bean.request.LoginRequest;
+import com.groot.business.dto.UserDTO;
 import com.groot.business.service.UserService;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,18 +25,13 @@ public class LoginController {
     }
 
     @PostMapping(value = "/login")
-    public BaseResponse login(@Validated @RequestBody User user, HttpServletResponse response) {
-        User result = userService.getUser(user);
-        if (null == result) {
-            throw new BusinessRuntimeException("账号或密码不正确");
-        }
-        StpUtil.login(result.getId(),
+    public Response<UserDTO> login(@Validated @RequestBody LoginRequest request, HttpServletResponse response) {
+        UserDTO userDTO = userService.getUserByAccountAndPassword(request.getAccount(), request.getPassword());
+        StpUtil.login(userDTO.getId(),
                 SaLoginConfig
-                        .setExtra("id", result.getId())
-                        .setExtra("account", result.getAccount()));
-        Cookie userIdCookie = new Cookie("userId", result.getId());
-        userIdCookie.setPath("/");
-        response.addCookie(userIdCookie);
-        return BaseResponse.success("登陆成功");
+                        .setExtra("account", userDTO.getAccount())
+                        .setExtra("displayName", userDTO.getDisplayName()));
+
+        return Response.success("登陆成功", userDTO);
     }
 }

@@ -1,7 +1,6 @@
 package com.groot.business.controller;
 
-import com.groot.base.bean.result.BaseResponse;
-import com.groot.base.bean.result.ListResponse;
+import com.groot.business.bean.response.base.Response;
 import com.groot.business.model.Memorandum;
 import com.groot.business.service.MemorandumService;
 
@@ -24,16 +23,16 @@ public class MemorandumController {
     }
 
     @GetMapping(value = "/listMemorandum")
-    public ListResponse<Memorandum> list() {
+    public Response<List<Memorandum>> list() {
         List<Memorandum> memorandums = memorandumService.list();
-        return ListResponse.success("获取备忘录列表成功！", memorandums);
+        return Response.success("获取备忘录列表成功！", memorandums);
     }
 
     @DeleteMapping(value = "{id}/deleteMemorandumById")
-    public BaseResponse deleteById(
+    public Response<Void> deleteById(
             @NotBlank(message = "备忘录ID不可为空") @PathVariable String id) throws IOException {
         memorandumService.deleteById(id);
-        return BaseResponse.success("删除成功");
+        return Response.success("删除成功");
     }
 
 }

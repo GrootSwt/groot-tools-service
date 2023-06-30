@@ -1,6 +1,6 @@
 package com.groot.business.model;
 
-import com.groot.base.model.BaseModel;
+import com.groot.business.model.base.BaseModel;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

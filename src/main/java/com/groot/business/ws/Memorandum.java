@@ -2,10 +2,9 @@ package com.groot.business.ws;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.groot.base.bean.result.ws.WSRequest;
-import com.groot.base.bean.result.ws.WSResponse;
+import com.groot.business.bean.request.base.WSRequest;
+import com.groot.business.bean.response.base.WSResponse;
 import com.groot.business.bean.MemorandumOperationTypeEnum;
-import com.groot.business.model.Memorandum;
 import com.groot.business.model.User;
 import com.groot.business.utils.WSUtil;
 import com.groot.business.ws.handler.MemorandumAppendHandler;
@@ -26,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Slf4j
 @Component
-public class MemorandumHandler implements WebSocketHandler {
+public class Memorandum implements WebSocketHandler {
 
     private static final AtomicInteger sessionNumber = new AtomicInteger(0);
 
@@ -34,7 +33,7 @@ public class MemorandumHandler implements WebSocketHandler {
 
     private final MemorandumAppendHandler memorandumAppendHandler;
 
-    public MemorandumHandler(final MemorandumAppendHandler memorandumAppendHandler) {
+    public Memorandum(final MemorandumAppendHandler memorandumAppendHandler) {
         this.memorandumAppendHandler = memorandumAppendHandler;
     }
 
@@ -45,7 +44,7 @@ public class MemorandumHandler implements WebSocketHandler {
         if (null != protocols && !protocols.isEmpty()) {
             sessions.add(session);
             sessionNumber.addAndGet(1);
-            log.info("备忘录服务连接成功，当前连接数：" + sessionNumber.get());
+            log.info(WSUtil.getUserFromProtocols(session).getDisplayName() + " 备忘录服务连接成功，当前连接数：" + sessionNumber.get());
         }
     }
 
@@ -54,7 +53,7 @@ public class MemorandumHandler implements WebSocketHandler {
         User user = WSUtil.getUserFromProtocols(session);
         if (message.getPayload() instanceof String) {
             if (MemorandumOperationTypeEnum.HEARTBEAT.getValue().equals(message.getPayload())) {
-                log.info("备忘录客户端<" + user.getAccount() + ">心跳检测");
+                log.info("备忘录客户端<" + user.getDisplayName() + ">心跳检测");
                 session.sendMessage(message);
             } else {
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -79,7 +78,7 @@ public class MemorandumHandler implements WebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         sessions.remove(session);
         sessionNumber.addAndGet(-1);
-        log.info("备忘录服务断开连接，当前连接数：" + sessionNumber.get());
+        log.info(WSUtil.getUserFromProtocols(session).getDisplayName() + " 备忘录服务断开连接，当前连接数：" + sessionNumber.get());
     }
 
     @Override
@@ -91,7 +90,7 @@ public class MemorandumHandler implements WebSocketHandler {
         WSUtil.heartbeat(sessions, sessionNumber, "备忘录服务");
     }
 
-    public static void sendAll(List<Memorandum> memorandums) throws IOException {
+    public static void sendAll(List<com.groot.business.model.Memorandum> memorandums) throws IOException {
         String userId = StpUtil.getLoginIdAsString();
         for (WebSocketSession session : sessions) {
             if (WSUtil.getUserFromProtocols(session).getId().equals(userId)) {

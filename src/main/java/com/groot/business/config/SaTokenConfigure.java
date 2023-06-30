@@ -1,4 +1,4 @@
-package com.groot.base.config;
+package com.groot.business.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

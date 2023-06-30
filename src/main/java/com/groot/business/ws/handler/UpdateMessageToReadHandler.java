@@ -3,7 +3,9 @@ package com.groot.business.ws.handler;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicReference;
 
+import com.groot.business.dto.UnreadMessageCountDTO;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
@@ -11,10 +13,9 @@ import org.springframework.web.socket.WebSocketSession;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.groot.base.bean.result.ws.WSResponse;
-import com.groot.base.bean.result.ws.WSRequest;
+import com.groot.business.bean.response.base.WSResponse;
+import com.groot.business.bean.request.base.WSRequest;
 import com.groot.business.bean.ChatOperationTypeEnum;
-import com.groot.business.dto.MessageDTO;
 import com.groot.business.model.User;
 import com.groot.business.service.MessageService;
 import com.groot.business.utils.WSUtil;
@@ -25,55 +26,67 @@ import lombok.Data;
 @Component
 public class UpdateMessageToReadHandler {
 
-  private final MessageService messageService;
+    private final MessageService messageService;
 
-  public UpdateMessageToReadHandler(final MessageService messageService) {
-    this.messageService = messageService;
-  }
+    public UpdateMessageToReadHandler(final MessageService messageService) {
+        this.messageService = messageService;
+    }
 
-  public void handler(WebSocketSession session, WebSocketMessage<?> message,
-      CopyOnWriteArraySet<WebSocketSession> sessions) throws IOException {
-    ObjectMapper objectMapper = new ObjectMapper();
-    WSRequest<ChatOperationTypeEnum, UpdateMessageToReadParams> request = objectMapper.readValue(
-        (String) message.getPayload(),
-        new TypeReference<WSRequest<ChatOperationTypeEnum, UpdateMessageToReadParams>>() {
+    public void handler(WebSocketSession session, WebSocketMessage<?> message,
+                        CopyOnWriteArraySet<WebSocketSession> sessions) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        WSRequest<ChatOperationTypeEnum, UpdateMessageToReadParams> request = objectMapper.readValue(
+                (String) message.getPayload(),
+                new TypeReference<>() {
+                });
+        String friendId = request.getParams().getFriendId();
+        String userId = WSUtil.getUserFromProtocols(session).getId();
+        List<String> unreadMessageIds = request.getParams().getUnreadMessageIds();
+        // 获取双方未读消息条数
+        List<UnreadMessageCountDTO> unreadMessageCountDTOList = messageService.updateMessageToRead(unreadMessageIds, friendId, userId);
+        AtomicReference<Integer> userUnreadMessageCount = new AtomicReference<>(0);
+        AtomicReference<Integer> friendUnreadMessageCount = new AtomicReference<>(0);
+        unreadMessageCountDTOList.forEach(unreadMessageCountDTO -> {
+            if (unreadMessageCountDTO.getSenderId().equals(friendId) && unreadMessageCountDTO.getReceiverId().equals(userId)) {
+                userUnreadMessageCount.set(unreadMessageCountDTO.getCount());
+            }
+            if (unreadMessageCountDTO.getSenderId().equals(userId) && unreadMessageCountDTO.getReceiverId().equals(friendId)) {
+                friendUnreadMessageCount.set(unreadMessageCountDTO.getCount());
+            }
         });
-    String senderId = request.getParams().getSenderId();
-    String receiverId = request.getParams().getReceiverId();
-    List<MessageDTO> messageDTOList = messageService.updateMessageRead(senderId, receiverId);
-    session.sendMessage(
-        new TextMessage(objectMapper.writeValueAsString(WSResponse.success(
-            "消息已读成功",
-            ChatOperationTypeEnum.READ,
-            new UpdateMessageToReadData(senderId, receiverId, messageDTOList)))));
-    sessions.forEach(s -> {
-      try {
-        User sender = WSUtil.getUserFromProtocols(s);
-        if (sender.getId().equals(senderId)) {
-          s.sendMessage(new TextMessage(objectMapper.writeValueAsString(WSResponse.success(
-              "消息已读成功",
-              ChatOperationTypeEnum.READ,
-              new UpdateMessageToReadData(senderId, receiverId, messageDTOList)))));
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    });
-  }
+        session.sendMessage(
+                new TextMessage(objectMapper.writeValueAsString(WSResponse.success(
+                        "消息已读成功",
+                        ChatOperationTypeEnum.READ,
+                        new UpdateMessageToReadData(friendId, unreadMessageIds, userUnreadMessageCount.get())))));
+        sessions.forEach(s -> {
+            try {
+                User sender = WSUtil.getUserFromProtocols(s);
+                if (sender.getId().equals(friendId)) {
+                    s.sendMessage(new TextMessage(objectMapper.writeValueAsString(WSResponse.success(
+                            "消息已读成功",
+                            ChatOperationTypeEnum.READ,
+                            new UpdateMessageToReadData(userId, unreadMessageIds, friendUnreadMessageCount.get())))));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
 }
 
 @Data
 @AllArgsConstructor
 class UpdateMessageToReadData {
-  private String senderId;
+    private String friendId;
 
-  private String receiverId;
+    private List<String> readMessageIds;
 
-  private List<MessageDTO> messageList;
+    private Integer unreadCount;
 }
 
 @Data
 class UpdateMessageToReadParams {
-  private String senderId;
-  private String receiverId;
+    private String friendId;
+    private List<String> unreadMessageIds;
 }

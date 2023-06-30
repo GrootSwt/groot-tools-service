@@ -10,8 +10,8 @@ import org.springframework.web.socket.WebSocketSession;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.groot.base.bean.result.ws.WSRequest;
-import com.groot.base.bean.result.ws.WSResponse;
+import com.groot.business.bean.request.base.WSRequest;
+import com.groot.business.bean.response.base.WSResponse;
 import com.groot.business.bean.MemorandumOperationTypeEnum;
 import com.groot.business.model.Memorandum;
 import com.groot.business.model.User;
@@ -43,10 +43,10 @@ public class MemorandumAppendHandler {
     data.setUserId(user.getId());
     data.setContent(request.getParams().getContent());
     memorandumService.save(data);
-    log.info(user.getAccount() + "群发备忘录：" + message.getPayload());
+    log.info(user.getDisplayName() + "群发备忘录：" + message.getPayload());
     sessions.forEach(s -> {
       try {
-        if (WSUtil.getUserFromProtocols(s).getAccount().equals(user.getAccount())) {
+        if (WSUtil.getUserFromProtocols(s).getId().equals(user.getId())) {
           s.sendMessage(new TextMessage(objectMapper.writeValueAsString(
               WSResponse.success("添加备忘录成功", MemorandumOperationTypeEnum.APPEND, data))));
         }

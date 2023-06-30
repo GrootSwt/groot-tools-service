@@ -1,4 +1,4 @@
-package com.groot.base.exception;
+package com.groot.business.exception;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

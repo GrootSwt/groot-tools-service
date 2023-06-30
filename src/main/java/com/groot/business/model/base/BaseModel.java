@@ -1,4 +1,4 @@
-package com.groot.base.model;
+package com.groot.business.model.base;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;

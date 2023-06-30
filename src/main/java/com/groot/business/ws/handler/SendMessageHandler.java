@@ -2,10 +2,11 @@ package com.groot.business.ws.handler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.groot.base.bean.result.ws.WSResponse;
-import com.groot.base.bean.result.ws.WSRequest;
+import com.groot.business.bean.response.base.WSResponse;
+import com.groot.business.bean.request.base.WSRequest;
 import com.groot.business.bean.ChatOperationTypeEnum;
 import com.groot.business.dto.MessageDTO;
+import com.groot.business.dto.UnreadMessageCountDTO;
 import com.groot.business.model.User;
 import com.groot.business.service.MessageService;
 import com.groot.business.utils.WSUtil;
@@ -19,6 +20,7 @@ import org.springframework.web.socket.WebSocketSession;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 public class SendMessageHandler {
@@ -35,26 +37,38 @@ public class SendMessageHandler {
         WSRequest<ChatOperationTypeEnum, SendMessageParams> request = objectMapper
                 .readValue(
                         (String) message.getPayload(),
-                        new TypeReference<WSRequest<ChatOperationTypeEnum, SendMessageParams>>() {
+                        new TypeReference<>() {
                         });
-        String senderId = request.getParams().getSenderId();
-        String receiverId = request.getParams().getReceiverId();
-        String messageContent = request.getParams().getMessage();
-        List<MessageDTO> messageDTOList = messageService.addMessage(senderId, receiverId, messageContent);
+        String userId = WSUtil.getUserFromProtocols(session).getId();
+        String friendId = request.getParams().getFriendId();
+        String content = request.getParams().getMessage();
+        MessageDTO messageDTO = messageService.addMessage(userId, friendId, content);
+        List<UnreadMessageCountDTO> unreadMessageCountDTOList = messageService.listUnreadMessageCount(userId, friendId);
+        AtomicReference<Integer> userUnreadMessageCount = new AtomicReference<>(0);
+        AtomicReference<Integer> friendUnreadMessageCount = new AtomicReference<>(0);
+        unreadMessageCountDTOList.forEach(unreadMessageCountDTO -> {
+            if (unreadMessageCountDTO.getReceiverId().equals(userId) && unreadMessageCountDTO.getSenderId().equals(friendId)) {
+                userUnreadMessageCount.set(unreadMessageCountDTO.getCount());
+            }
+            if (unreadMessageCountDTO.getSenderId().equals(userId) && unreadMessageCountDTO.getReceiverId().equals(friendId)) {
+                friendUnreadMessageCount.set(unreadMessageCountDTO.getCount());
+            }
+        });
+
         session.sendMessage(
                 new TextMessage(objectMapper.writeValueAsString(WSResponse.success(
                         "发送消息成功",
                         ChatOperationTypeEnum.SEND,
-                        new SendMessageData(senderId, receiverId, messageDTOList)))));
+                        new SendMessageData(friendId, messageDTO, userUnreadMessageCount.get())))));
         sessions.forEach(s -> {
             try {
                 User receiver = WSUtil.getUserFromProtocols(s);
-                if (receiver.getId().equals(receiverId)) {
+                if (receiver.getId().equals(friendId)) {
                     s.sendMessage(new TextMessage(
                             objectMapper.writeValueAsString(WSResponse.success(
                                     "接收消息成功",
                                     ChatOperationTypeEnum.SEND,
-                                    new SendMessageData(senderId, receiverId, messageDTOList)))));
+                                    new SendMessageData(userId, messageDTO, friendUnreadMessageCount.get())))));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -66,18 +80,14 @@ public class SendMessageHandler {
 @Data
 @AllArgsConstructor
 class SendMessageData {
-    private String senderId;
-
-    private String receiverId;
-
-    private List<MessageDTO> messageList;
+    private String friendId;
+    private MessageDTO message;
+    private Integer unreadMessageCount;
 }
 
 @Data
 class SendMessageParams {
-    private String senderId;
-
-    private String receiverId;
+    private String friendId;
 
     private String message;
 }
