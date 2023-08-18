@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.groot.business.dto.UnreadMessageCountDTO;
+import com.groot.business.bean.response.UnreadMessageCountResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
@@ -43,10 +43,10 @@ public class UpdateMessageToReadHandler {
         String userId = WSUtil.getUserFromProtocols(session).getId();
         List<String> unreadMessageIds = request.getParams().getUnreadMessageIds();
         // 获取双方未读消息条数
-        List<UnreadMessageCountDTO> unreadMessageCountDTOList = messageService.updateMessageToRead(unreadMessageIds, friendId, userId);
+        List<UnreadMessageCountResponse> unreadMessageCountResponseList = messageService.updateMessageToRead(unreadMessageIds, friendId, userId);
         AtomicReference<Integer> userUnreadMessageCount = new AtomicReference<>(0);
         AtomicReference<Integer> friendUnreadMessageCount = new AtomicReference<>(0);
-        unreadMessageCountDTOList.forEach(unreadMessageCountDTO -> {
+        unreadMessageCountResponseList.forEach(unreadMessageCountDTO -> {
             if (unreadMessageCountDTO.getSenderId().equals(friendId) && unreadMessageCountDTO.getReceiverId().equals(userId)) {
                 userUnreadMessageCount.set(unreadMessageCountDTO.getCount());
             }

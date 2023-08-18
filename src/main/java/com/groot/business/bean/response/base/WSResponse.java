@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class WSResponse<O, T> {
-    private Integer status = 200;
+    private Integer status;
     private String message;
     private O operationType;
     private T data;

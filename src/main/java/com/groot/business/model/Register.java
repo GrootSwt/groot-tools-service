@@ -1,14 +1,14 @@
 package com.groot.business.model;
 
+import com.groot.business.bean.RegisterStatusEnum;
 import com.groot.business.model.base.BaseModel;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import org.hibernate.validator.constraints.Length;
+import lombok.*;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class User extends BaseModel {
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@AllArgsConstructor
+public class Register extends BaseModel {
     /**
      * 账号
      */
@@ -29,4 +29,9 @@ public class User extends BaseModel {
      * 邮箱账号
      */
     private String email;
+
+    /**
+     * 注册状态
+     */
+    private RegisterStatusEnum status;
 }

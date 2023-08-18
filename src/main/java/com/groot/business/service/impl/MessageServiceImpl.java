@@ -1,9 +1,9 @@
 package com.groot.business.service.impl;
 
 import com.groot.business.bean.ReadStatusEnum;
-import com.groot.business.dto.MessageDTO;
-import com.groot.business.dto.MessageListDTO;
-import com.groot.business.dto.UnreadMessageCountDTO;
+import com.groot.business.bean.response.MessageResponse;
+import com.groot.business.bean.response.MessageListResponse;
+import com.groot.business.bean.response.UnreadMessageCountResponse;
 import com.groot.business.mapper.MessageMapper;
 import com.groot.business.model.Message;
 import com.groot.business.service.MessageService;
@@ -25,40 +25,40 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public MessageListDTO listMessage(String friendId, String prevMessageId) {
+    public MessageListResponse listMessage(String friendId, String prevMessageId) {
         String userId = StpUtil.getLoginIdAsString();
         Integer pageSize = 30;
         if (prevMessageId == null) {
-            List<MessageDTO> messageList = messageMapper.listMessage(pageSize, userId, friendId, null);
-            return new MessageListDTO(messageList.size() == 30, messageList);
+            List<MessageResponse> messageList = messageMapper.listMessage(pageSize, userId, friendId, null);
+            return new MessageListResponse(messageList.size() == 30, messageList);
         }
         Long rowNumber = messageMapper.listMessageRowNumberById(userId, friendId, prevMessageId);
-        List<MessageDTO> messageList = messageMapper.listMessage(pageSize, userId, friendId, rowNumber);
-        return new MessageListDTO(rowNumber == 0L, messageList);
+        List<MessageResponse> messageList = messageMapper.listMessage(pageSize, userId, friendId, rowNumber);
+        return new MessageListResponse(rowNumber == 0L, messageList);
     }
 
     @Override
-    public List<UnreadMessageCountDTO> listUnreadMessageCount(String friendId, String userId) {
+    public List<UnreadMessageCountResponse> listUnreadMessageCount(String friendId, String userId) {
         return messageMapper.listUnreadMessageCount(friendId, userId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public List<UnreadMessageCountDTO> updateMessageToRead(List<String> unreadMessageIds, String friendId, String userId) {
+    public List<UnreadMessageCountResponse> updateMessageToRead(List<String> unreadMessageIds, String friendId, String userId) {
         messageMapper.updateMessageToRead(unreadMessageIds, friendId, userId);
         return this.listUnreadMessageCount(friendId, userId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public MessageDTO addMessage(String userId, String friendId, String content) {
+    public MessageResponse addMessage(String userId, String friendId, String content) {
         Message message = new Message();
         message.setSenderId(userId);
         message.setReceiverId(friendId);
         message.setContent(content);
         message.setReadStatus(ReadStatusEnum.UNREAD);
         messageMapper.insert(message);
-        return new MessageDTO(
+        return new MessageResponse(
                 message.getId(),
                 userId,
                 friendId,

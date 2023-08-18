@@ -1,4 +1,4 @@
-package com.groot.business.dto;
+package com.groot.business.bean.response;
 
 import com.groot.business.bean.ReadStatusEnum;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MessageDTO {
+public class MessageResponse {
     private String id;
 
     private String senderId;

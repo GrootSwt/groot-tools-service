@@ -1,5 +1,6 @@
 package com.groot.business.config;
 
+import io.micrometer.common.lang.NonNullApi;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.lang.Nullable;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@NonNullApi
 public class WebSocketInterceptor implements HandshakeInterceptor {
 
     @Override

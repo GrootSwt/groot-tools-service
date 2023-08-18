@@ -1,8 +1,8 @@
 package com.groot.business.controller;
 
 import com.groot.business.bean.response.base.Response;
-import com.groot.business.dto.FriendDTO;
-import com.groot.business.dto.FriendWithUnreadMsgCountDTO;
+import com.groot.business.bean.response.FriendResponse;
+import com.groot.business.bean.response.FriendWithUnreadMsgCountResponse;
 import com.groot.business.service.FriendService;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
@@ -26,14 +26,14 @@ public class FriendController {
     }
 
     @GetMapping(value = "/listFriend")
-    public Response<List<FriendDTO>> listFriend() {
-        List<FriendDTO> friendDTOList = friendService.listFriend();
-        return Response.success("获取朋友列表成功", friendDTOList);
+    public Response<List<FriendResponse>> listFriend() {
+        List<FriendResponse> friendResponseList = friendService.listFriend();
+        return Response.success("获取朋友列表成功", friendResponseList);
     }
 
     @GetMapping(value = "/listFriendWithUnreadMsgCount")
-    public Response<List<FriendWithUnreadMsgCountDTO>> listFriendWithUnreadMsgCount() {
-        List<FriendWithUnreadMsgCountDTO> friendWithUnreadMsgCountDTOList = friendService.listFriendWithUnreadMsgCount();
+    public Response<List<FriendWithUnreadMsgCountResponse>> listFriendWithUnreadMsgCount() {
+        List<FriendWithUnreadMsgCountResponse> friendWithUnreadMsgCountDTOList = friendService.listFriendWithUnreadMsgCount();
         return Response.success("获取朋友列表和未读消息数量成功", friendWithUnreadMsgCountDTOList);
     }
 }

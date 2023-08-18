@@ -1,9 +1,9 @@
-package com.groot.business.dto;
+package com.groot.business.bean.response;
 
 import lombok.Data;
 
 @Data
-public class UnreadMessageCountDTO {
+public class UnreadMessageCountResponse {
 
     private String senderId;
 

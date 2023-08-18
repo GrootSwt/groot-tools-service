@@ -1,7 +1,7 @@
 package com.groot.business.controller;
 
 import com.groot.business.bean.response.base.Response;
-import com.groot.business.dto.MessageListDTO;
+import com.groot.business.bean.response.MessageListResponse;
 import com.groot.business.service.MessageService;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
@@ -21,9 +21,9 @@ public class MessageController {
 
 
     @GetMapping("/{friendId}/listMessage")
-    public Response<MessageListDTO> listMessage(@PathVariable String friendId,
-                                                @RequestParam(required = false) String prevMessageId) {
-        MessageListDTO messageDTOList = messageService.listMessage(friendId, prevMessageId);
+    public Response<MessageListResponse> listMessage(@PathVariable String friendId,
+                                                     @RequestParam(required = false) String prevMessageId) {
+        MessageListResponse messageDTOList = messageService.listMessage(friendId, prevMessageId);
         return Response.success("获取消息列表成功", messageDTOList);
     }
 

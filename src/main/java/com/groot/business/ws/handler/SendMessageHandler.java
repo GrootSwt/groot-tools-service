@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.groot.business.bean.response.base.WSResponse;
 import com.groot.business.bean.request.base.WSRequest;
 import com.groot.business.bean.ChatOperationTypeEnum;
-import com.groot.business.dto.MessageDTO;
-import com.groot.business.dto.UnreadMessageCountDTO;
+import com.groot.business.bean.response.MessageResponse;
+import com.groot.business.bean.response.UnreadMessageCountResponse;
 import com.groot.business.model.User;
 import com.groot.business.service.MessageService;
 import com.groot.business.utils.WSUtil;
@@ -42,11 +42,11 @@ public class SendMessageHandler {
         String userId = WSUtil.getUserFromProtocols(session).getId();
         String friendId = request.getParams().getFriendId();
         String content = request.getParams().getMessage();
-        MessageDTO messageDTO = messageService.addMessage(userId, friendId, content);
-        List<UnreadMessageCountDTO> unreadMessageCountDTOList = messageService.listUnreadMessageCount(userId, friendId);
+        MessageResponse messageResponse = messageService.addMessage(userId, friendId, content);
+        List<UnreadMessageCountResponse> unreadMessageCountResponseList = messageService.listUnreadMessageCount(userId, friendId);
         AtomicReference<Integer> userUnreadMessageCount = new AtomicReference<>(0);
         AtomicReference<Integer> friendUnreadMessageCount = new AtomicReference<>(0);
-        unreadMessageCountDTOList.forEach(unreadMessageCountDTO -> {
+        unreadMessageCountResponseList.forEach(unreadMessageCountDTO -> {
             if (unreadMessageCountDTO.getReceiverId().equals(userId) && unreadMessageCountDTO.getSenderId().equals(friendId)) {
                 userUnreadMessageCount.set(unreadMessageCountDTO.getCount());
             }
@@ -59,7 +59,7 @@ public class SendMessageHandler {
                 new TextMessage(objectMapper.writeValueAsString(WSResponse.success(
                         "发送消息成功",
                         ChatOperationTypeEnum.SEND,
-                        new SendMessageData(friendId, messageDTO, userUnreadMessageCount.get())))));
+                        new SendMessageData(friendId, messageResponse, userUnreadMessageCount.get())))));
         sessions.forEach(s -> {
             try {
                 User receiver = WSUtil.getUserFromProtocols(s);
@@ -68,7 +68,7 @@ public class SendMessageHandler {
                             objectMapper.writeValueAsString(WSResponse.success(
                                     "接收消息成功",
                                     ChatOperationTypeEnum.SEND,
-                                    new SendMessageData(userId, messageDTO, friendUnreadMessageCount.get())))));
+                                    new SendMessageData(userId, messageResponse, friendUnreadMessageCount.get())))));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -81,7 +81,7 @@ public class SendMessageHandler {
 @AllArgsConstructor
 class SendMessageData {
     private String friendId;
-    private MessageDTO message;
+    private MessageResponse message;
     private Integer unreadMessageCount;
 }
 

@@ -1,4 +1,4 @@
-package com.groot.business.dto;
+package com.groot.business.bean.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,9 +9,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MessageListDTO {
+public class MessageListResponse {
 
     private Boolean hasPrev;
 
-    private List<MessageDTO> messageList;
+    private List<MessageResponse> messageList;
 }

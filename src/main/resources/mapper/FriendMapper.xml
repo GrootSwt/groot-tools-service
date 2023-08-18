@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.groot.business.mapper.FriendMapper">
-    <resultMap id="friend" type="com.groot.business.dto.FriendDTO">
+    <resultMap id="friend" type="com.groot.business.bean.response.FriendResponse">
         <id column="id" property="id" />
         <result column="user_id" property="userId"/>
         <result column="friend_id" property="friendId" />
@@ -28,7 +28,7 @@
           and f.deleted = 0
           and u.deleted = 0
     </select>
-    <select id="listFriendWithUnreadMsgCount" resultType="com.groot.business.dto.FriendWithUnreadMsgCountDTO">
+    <select id="listFriendWithUnreadMsgCount" resultType="com.groot.business.bean.response.FriendWithUnreadMsgCountResponse">
         select f.id,
                f.user_id,
                f.friend_id,

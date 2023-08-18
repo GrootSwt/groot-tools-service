@@ -6,7 +6,7 @@ import cn.dev33.satoken.stp.SaLoginConfig;
 import cn.dev33.satoken.stp.StpUtil;
 
 import com.groot.business.bean.request.LoginRequest;
-import com.groot.business.dto.UserDTO;
+import com.groot.business.bean.response.UserResponse;
 import com.groot.business.service.UserService;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,13 +25,13 @@ public class LoginController {
     }
 
     @PostMapping(value = "/login")
-    public Response<UserDTO> login(@Validated @RequestBody LoginRequest request, HttpServletResponse response) {
-        UserDTO userDTO = userService.getUserByAccountAndPassword(request.getAccount(), request.getPassword());
-        StpUtil.login(userDTO.getId(),
+    public Response<UserResponse> login(@Validated @RequestBody LoginRequest request, HttpServletResponse response) {
+        UserResponse userResponse = userService.getUserByAccountAndPassword(request.getAccount(), request.getPassword());
+        StpUtil.login(userResponse.getId(),
                 SaLoginConfig
-                        .setExtra("account", userDTO.getAccount())
-                        .setExtra("displayName", userDTO.getDisplayName()));
+                        .setExtra("account", userResponse.getAccount())
+                        .setExtra("displayName", userResponse.getDisplayName()));
 
-        return Response.success("登陆成功", userDTO);
+        return Response.success("登陆成功", userResponse);
     }
 }

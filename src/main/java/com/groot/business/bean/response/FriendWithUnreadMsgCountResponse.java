@@ -1,11 +1,11 @@
-package com.groot.business.dto;
+package com.groot.business.bean.response;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class FriendWithUnreadMsgCountDTO extends FriendDTO {
+public class FriendWithUnreadMsgCountResponse extends FriendResponse {
 
     /**
      * 未读消息数量

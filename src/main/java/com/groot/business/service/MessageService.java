@@ -1,18 +1,18 @@
 package com.groot.business.service;
 
-import com.groot.business.dto.MessageDTO;
-import com.groot.business.dto.MessageListDTO;
-import com.groot.business.dto.UnreadMessageCountDTO;
+import com.groot.business.bean.response.MessageResponse;
+import com.groot.business.bean.response.MessageListResponse;
+import com.groot.business.bean.response.UnreadMessageCountResponse;
 
 import java.util.List;
 
 public interface MessageService {
-    MessageListDTO listMessage(String friendId, String prevMessageId);
+    MessageListResponse listMessage(String friendId, String prevMessageId);
 
 
-    List<UnreadMessageCountDTO> listUnreadMessageCount(String senderId, String receiverId);
+    List<UnreadMessageCountResponse> listUnreadMessageCount(String senderId, String receiverId);
 
-    List<UnreadMessageCountDTO> updateMessageToRead(List<String> unreadMessageIds, String friendId, String userId);
+    List<UnreadMessageCountResponse> updateMessageToRead(List<String> unreadMessageIds, String friendId, String userId);
 
-    MessageDTO addMessage(String userId, String friendId, String message);
+    MessageResponse addMessage(String userId, String friendId, String message);
 }

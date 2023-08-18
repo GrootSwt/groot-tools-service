@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.groot.business.mapper.MessageMapper">
-    <select id="listMessage" resultType="com.groot.business.dto.MessageDTO">
+    <select id="listMessage" resultType="com.groot.business.bean.response.MessageResponse">
         select *
         from (select m.id,
                      m.sender_id,
@@ -22,7 +22,7 @@
         order by m.create_time
     </select>
     <select id="listUnreadMessageCount"
-            resultType="com.groot.business.dto.UnreadMessageCountDTO">
+            resultType="com.groot.business.bean.response.UnreadMessageCountResponse">
         select m.sender_id,
                m.receiver_id,
                count(m.sender_id) as count

@@ -1,12 +1,12 @@
 package com.groot.business.service;
 
-import com.groot.business.dto.FriendDTO;
-import com.groot.business.dto.FriendWithUnreadMsgCountDTO;
+import com.groot.business.bean.response.FriendResponse;
+import com.groot.business.bean.response.FriendWithUnreadMsgCountResponse;
 
 import java.util.List;
 
 public interface FriendService {
-    List<FriendDTO> listFriend();
+    List<FriendResponse> listFriend();
 
-    List<FriendWithUnreadMsgCountDTO> listFriendWithUnreadMsgCount();
+    List<FriendWithUnreadMsgCountResponse> listFriendWithUnreadMsgCount();
 }

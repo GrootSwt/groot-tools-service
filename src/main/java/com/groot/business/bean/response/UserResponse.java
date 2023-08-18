@@ -1,4 +1,4 @@
-package com.groot.business.dto;
+package com.groot.business.bean.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO {
+public class UserResponse {
   private String id;
 
   private String account;
@@ -15,5 +15,7 @@ public class UserDTO {
   private String displayName;
 
   private String phoneNumber;
+
+  private String email;
 
 }

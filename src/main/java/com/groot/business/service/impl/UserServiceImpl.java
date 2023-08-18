@@ -2,7 +2,7 @@ package com.groot.business.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.groot.business.exception.BusinessRuntimeException;
-import com.groot.business.dto.UserDTO;
+import com.groot.business.bean.response.UserResponse;
 import com.groot.business.mapper.UserMapper;
 import com.groot.business.model.User;
 import com.groot.business.service.UserService;
@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO getUserByAccountAndPassword(String account, String password) {
+    public UserResponse getUserByAccountAndPassword(String account, String password) {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("account", account);
         wrapper.eq("password", password);
@@ -36,15 +36,20 @@ public class UserServiceImpl implements UserService {
         if (null == user) {
             throw new BusinessRuntimeException("账号或密码不正确");
         }
-        UserDTO result = new UserDTO(user.getId(), user.getAccount(), user.getDisplayName(), user.getPhoneNumber());
-        return result;
+        return new UserResponse(user.getId(), user.getAccount(), user.getDisplayName(), user.getPhoneNumber(), user.getEmail());
     }
 
     @Override
-    public UserDTO getUserById() {
+    public UserResponse getUserById() {
         String userId = StpUtil.getLoginIdAsString();
         User user = userMapper.selectById(userId);
-        UserDTO result = new UserDTO(userId, user.getAccount(), user.getDisplayName(), user.getPhoneNumber());
-        return result;
+        return new UserResponse(userId, user.getAccount(), user.getDisplayName(), user.getPhoneNumber(), user.getEmail());
+    }
+
+    @Override
+    public Boolean accountExistCheck(String account) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("account", account);
+        return userMapper.exists(queryWrapper);
     }
 }
