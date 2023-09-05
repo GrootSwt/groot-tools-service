@@ -15,4 +15,9 @@ application:
   # sa-token配置
   sa-token:
     jwt-secret-key: uhqeiwfnw12qi32ofiqwoe12uhfiw
+  mail:
+    host: xxx
+    port: xxx
+    password: xxx
+    username: xxx
     

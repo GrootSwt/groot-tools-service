@@ -15,7 +15,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.groot.business.bean.response.base.WSResponse;
 import com.groot.business.bean.request.base.WSRequest;
-import com.groot.business.bean.ChatOperationTypeEnum;
+import com.groot.business.bean.enums.ChatOperationType;
 import com.groot.business.model.User;
 import com.groot.business.service.MessageService;
 import com.groot.business.utils.WSUtil;
@@ -28,14 +28,17 @@ public class UpdateMessageToReadHandler {
 
     private final MessageService messageService;
 
-    public UpdateMessageToReadHandler(final MessageService messageService) {
+    private final ObjectMapper objectMapper;
+
+    public UpdateMessageToReadHandler(final MessageService messageService,
+                                      final ObjectMapper objectMapper) {
         this.messageService = messageService;
+        this.objectMapper = objectMapper;
     }
 
     public void handler(WebSocketSession session, WebSocketMessage<?> message,
                         CopyOnWriteArraySet<WebSocketSession> sessions) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        WSRequest<ChatOperationTypeEnum, UpdateMessageToReadParams> request = objectMapper.readValue(
+        WSRequest<UpdateMessageToReadParams> request = objectMapper.readValue(
                 (String) message.getPayload(),
                 new TypeReference<>() {
                 });
@@ -57,7 +60,7 @@ public class UpdateMessageToReadHandler {
         session.sendMessage(
                 new TextMessage(objectMapper.writeValueAsString(WSResponse.success(
                         "消息已读成功",
-                        ChatOperationTypeEnum.READ,
+                        ChatOperationType.READ,
                         new UpdateMessageToReadData(friendId, unreadMessageIds, userUnreadMessageCount.get())))));
         sessions.forEach(s -> {
             try {
@@ -65,7 +68,7 @@ public class UpdateMessageToReadHandler {
                 if (sender.getId().equals(friendId)) {
                     s.sendMessage(new TextMessage(objectMapper.writeValueAsString(WSResponse.success(
                             "消息已读成功",
-                            ChatOperationTypeEnum.READ,
+                            ChatOperationType.READ,
                             new UpdateMessageToReadData(userId, unreadMessageIds, friendUnreadMessageCount.get())))));
                 }
             } catch (IOException e) {

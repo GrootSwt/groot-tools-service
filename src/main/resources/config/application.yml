@@ -25,6 +25,18 @@ spring:
           max-wait: -1ms
           max-idle: 10
           min-idle: 0
+  mail:
+    host: ${application.mail.host}
+    port: ${application.mail.port}
+    password: ${application.mail.password}
+    username: ${application.mail.username}
+    properties:
+      mail:
+        stmp:
+          ssl:
+            enable: true
+    protocol: smtp
+    default-encoding: UTF-8
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
@@ -43,3 +55,7 @@ sa-token:
   is-share: false
   is-log: true
   jwt-secret-key: ${application.sa-token.jwt-secret-key}
+
+website:
+  name: GrootSwt
+  location: http://tools.grootswt.top

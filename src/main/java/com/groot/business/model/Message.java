@@ -1,7 +1,7 @@
 package com.groot.business.model;
 
 import com.groot.business.model.base.BaseModel;
-import com.groot.business.bean.ReadStatusEnum;
+import com.groot.business.bean.enums.ReadStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -22,7 +22,7 @@ public class Message extends BaseModel {
     /**
     * 消息读取状态
     */
-    private ReadStatusEnum readStatus;
+    private ReadStatus readStatus;
     /**
     * 消息内容
     */

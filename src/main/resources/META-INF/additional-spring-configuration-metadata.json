@@ -28,5 +28,13 @@
     "name": "application.sa-token.jwt-secret-key",
     "type": "java.lang.String",
     "description": "A description for 'application.sa-token.jwt-secret-key'"
+  },
+  {
+    "name": "website.name",
+    "type": "java.lang.String"
+  },
+  {
+    "name": "website.location",
+    "type": "java.lang.String"
   }
 ]}

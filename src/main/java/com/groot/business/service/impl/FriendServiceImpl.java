@@ -1,7 +1,7 @@
 package com.groot.business.service.impl;
 
-import com.groot.business.bean.ReadStatusEnum;
-import com.groot.business.bean.RelationStatusEnum;
+import com.groot.business.bean.enums.ReadStatus;
+import com.groot.business.bean.enums.RelationStatus;
 import com.groot.business.bean.response.FriendResponse;
 import com.groot.business.bean.response.FriendWithUnreadMsgCountResponse;
 import com.groot.business.mapper.FriendMapper;
@@ -25,14 +25,14 @@ public class FriendServiceImpl implements FriendService {
     @Override
     public List<FriendResponse> listFriend() {
         String userId = StpUtil.getLoginIdAsString();
-        return friendMapper.listFriend(userId, RelationStatusEnum.FRIEND.getValue());
+        return friendMapper.listFriend(userId, RelationStatus.FRIEND.getValue());
     }
 
     @Override
     public List<FriendWithUnreadMsgCountResponse> listFriendWithUnreadMsgCount() {
         String userId = StpUtil.getLoginIdAsString();
-        return friendMapper.listFriendWithUnreadMsgCount(userId, ReadStatusEnum.UNREAD.getValue(),
-                RelationStatusEnum.FRIEND.getValue());
+        return friendMapper.listFriendWithUnreadMsgCount(userId, ReadStatus.UNREAD.getValue(),
+                RelationStatus.FRIEND.getValue());
     }
 
 }

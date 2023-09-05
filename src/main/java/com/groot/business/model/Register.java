@@ -1,6 +1,6 @@
 package com.groot.business.model;
 
-import com.groot.business.bean.RegisterStatusEnum;
+import com.groot.business.bean.enums.RegisterStatus;
 import com.groot.business.model.base.BaseModel;
 import lombok.*;
 
@@ -33,5 +33,5 @@ public class Register extends BaseModel {
     /**
      * 注册状态
      */
-    private RegisterStatusEnum status;
+    private RegisterStatus status;
 }

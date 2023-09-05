@@ -1,10 +1,15 @@
 application:
   datasource:
-    url: jdbc:mysql://172.24.246.243:3306/groot-tools?serveTimezone=GMT
+    url: jdbc:mysql://127.0.0.1:3306/groot-tools?serveTimezone=GMT
     username: root
-    password: Swt620523
+    password: 123456
   redis:
-    host: 172.24.246.243
+    host: 127.0.0.1
     port: 6379
   sa-token:
-    jwt-secret-key: hqiou12wehio43uwe3487hfiouawhefoia
+    jwt-secret-key: 123456
+  mail:
+    host: xxx
+    port: xxx
+    password: xxx
+    username: xxx

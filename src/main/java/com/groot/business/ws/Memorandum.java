@@ -2,9 +2,10 @@ package com.groot.business.ws;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.groot.business.bean.request.base.WSRequest;
 import com.groot.business.bean.response.base.WSResponse;
-import com.groot.business.bean.MemorandumOperationTypeEnum;
+import com.groot.business.bean.enums.MemorandumOperationType;
 import com.groot.business.model.User;
 import com.groot.business.utils.WSUtil;
 import com.groot.business.ws.handler.MemorandumAppendHandler;
@@ -33,8 +34,11 @@ public class Memorandum implements WebSocketHandler {
 
     private final MemorandumAppendHandler memorandumAppendHandler;
 
-    public Memorandum(final MemorandumAppendHandler memorandumAppendHandler) {
+    private final ObjectMapper objectMapper;
+
+    public Memorandum(final MemorandumAppendHandler memorandumAppendHandler, final ObjectMapper objectMapper) {
         this.memorandumAppendHandler = memorandumAppendHandler;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -52,16 +56,15 @@ public class Memorandum implements WebSocketHandler {
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         User user = WSUtil.getUserFromProtocols(session);
         if (message.getPayload() instanceof String) {
-            if (MemorandumOperationTypeEnum.HEARTBEAT.getValue().equals(message.getPayload())) {
+            if (MemorandumOperationType.HEARTBEAT.getDesc().equals(message.getPayload())) {
                 log.info("备忘录客户端<" + user.getDisplayName() + ">心跳检测");
                 session.sendMessage(message);
             } else {
-                ObjectMapper objectMapper = new ObjectMapper();
-                WSRequest<MemorandumOperationTypeEnum, ?> request = objectMapper.readValue(
-                        (String) message.getPayload(), new TypeReference<WSRequest<MemorandumOperationTypeEnum, ?>>() {
+                WSRequest<?> request = objectMapper.readValue(
+                        (String) message.getPayload(), new TypeReference<>() {
                         });
                 // 追加
-                if (MemorandumOperationTypeEnum.APPEND.getValue().equals(request.getOperationType().getValue())) {
+                if (MemorandumOperationType.APPEND.getDesc().equals(request.getOperationType())) {
                     memorandumAppendHandler.handler(user, session, message, sessions);
                 }
             }
@@ -94,9 +97,10 @@ public class Memorandum implements WebSocketHandler {
         String userId = StpUtil.getLoginIdAsString();
         for (WebSocketSession session : sessions) {
             if (WSUtil.getUserFromProtocols(session).getId().equals(userId)) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                session.sendMessage(new TextMessage(objectMapper.writeValueAsString(
-                        WSResponse.success("获取消息列表成功", MemorandumOperationTypeEnum.REPLACE, memorandums))));
+                ObjectMapper currentObjectMapper = new ObjectMapper();
+                currentObjectMapper.configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
+                session.sendMessage(new TextMessage(currentObjectMapper.writeValueAsString(
+                        WSResponse.success("获取消息列表成功", MemorandumOperationType.REPLACE, memorandums))));
             }
         }
     }

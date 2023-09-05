@@ -1,7 +1,7 @@
 package com.groot.business.model;
 
 import com.groot.business.model.base.BaseModel;
-import com.groot.business.bean.RelationStatusEnum;
+import com.groot.business.bean.enums.RelationStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -22,7 +22,7 @@ public class Friend extends BaseModel {
     /**
      * 关联关系
      */
-    private RelationStatusEnum status;
+    private RelationStatus status;
     /**
      * 备注名
      */

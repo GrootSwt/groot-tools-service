@@ -25,6 +25,12 @@ import java.util.List;
 @ControllerAdvice
 @RestController
 public class GlobalExceptionHandler {
+
+    private final ObjectMapper objectMapper;
+
+    public GlobalExceptionHandler(final ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
     /**
      * 全局异常处理器
      *
@@ -61,7 +67,6 @@ public class GlobalExceptionHandler {
     public void exceptionHandler(WSRuntimeException e) throws IOException {
         if (null != e.getSession() && e.getSession().isOpen()) {
             WSResponse<?, ?> response = WSResponse.failure(e.getCode(), e.getMessage());
-            ObjectMapper objectMapper = new ObjectMapper();
             e.getSession().sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
         }
     }

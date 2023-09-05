@@ -1,6 +1,6 @@
 package com.groot.business.bean.response;
 
-import com.groot.business.bean.ReadStatusEnum;
+import com.groot.business.bean.enums.ReadStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +19,7 @@ public class MessageResponse {
 
     private String content;
 
-    private ReadStatusEnum readStatus;
+    private ReadStatus readStatus;
 
     private Date createTime;
 }

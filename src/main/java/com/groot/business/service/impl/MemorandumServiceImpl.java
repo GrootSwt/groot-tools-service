@@ -2,8 +2,8 @@ package com.groot.business.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.groot.business.mapper.MemorandumMapper;
+import com.groot.business.model.Memorandum;
 import com.groot.business.service.MemorandumService;
-import com.groot.business.ws.Memorandum;
 
 import cn.dev33.satoken.stp.StpUtil;
 
@@ -23,8 +23,8 @@ public class MemorandumServiceImpl implements MemorandumService {
     }
 
     @Override
-    public List<com.groot.business.model.Memorandum> list() {
-        QueryWrapper<com.groot.business.model.Memorandum> wrapper = new QueryWrapper<>();
+    public List<Memorandum> list() {
+        QueryWrapper<Memorandum> wrapper = new QueryWrapper<>();
         String userId = StpUtil.getLoginIdAsString();
         wrapper.eq("user_id", userId);
         wrapper.orderByAsc("create_time");
@@ -33,16 +33,16 @@ public class MemorandumServiceImpl implements MemorandumService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void save(com.groot.business.model.Memorandum memorandum) {
+    public void save(Memorandum memorandum) {
         memorandumMapper.insert(memorandum);
     }
 
     @Override
     public void deleteById(String id) throws IOException {
-        com.groot.business.model.Memorandum memorandum = new com.groot.business.model.Memorandum();
+        Memorandum memorandum = new Memorandum();
         memorandum.setId(id);
         memorandumMapper.deleteById(memorandum);
-        List<com.groot.business.model.Memorandum> memorandums = this.list();
-        Memorandum.sendAll(memorandums);
+        List<Memorandum> memorandums = this.list();
+        com.groot.business.ws.Memorandum.sendAll(memorandums);
     }
 }

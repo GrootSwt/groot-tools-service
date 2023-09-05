@@ -3,7 +3,7 @@ package com.groot.business.ws;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.groot.business.bean.request.base.WSRequest;
-import com.groot.business.bean.ChatOperationTypeEnum;
+import com.groot.business.bean.enums.ChatOperationType;
 import com.groot.business.model.User;
 import com.groot.business.utils.WSUtil;
 import com.groot.business.ws.handler.SendMessageHandler;
@@ -30,10 +30,14 @@ public class Chat implements WebSocketHandler {
     private final SendMessageHandler sendMessageHandler;
     private final UpdateMessageToReadHandler updateMessageToReadHandler;
 
+    private final ObjectMapper objectMapper;
+
     public Chat(final UpdateMessageToReadHandler updateMessageToReadHandler,
-                SendMessageHandler sendMessageHandler) {
+                final SendMessageHandler sendMessageHandler,
+                final ObjectMapper objectMapper) {
         this.updateMessageToReadHandler = updateMessageToReadHandler;
         this.sendMessageHandler = sendMessageHandler;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -52,21 +56,20 @@ public class Chat implements WebSocketHandler {
         User user = WSUtil.getUserFromProtocols(session);
         if (message.getPayload() instanceof String) {
             // 客户端心跳检测
-            if (ChatOperationTypeEnum.HEARTBEAT.getValue().equals(message.getPayload())) {
+            if (ChatOperationType.HEARTBEAT.getDesc().equals(message.getPayload())) {
                 log.info("聊天客户端<" + user.getDisplayName() + ">心跳检测");
                 session.sendMessage(message);
             } else {
-                ObjectMapper objectMapper = new ObjectMapper();
-                WSRequest<ChatOperationTypeEnum, ?> requestTemp = objectMapper.readValue(
+                WSRequest<?> requestTemp = objectMapper.readValue(
                         (String) message.getPayload(),
                         new TypeReference<>() {
                         });
                 // 消息已读
-                if (ChatOperationTypeEnum.READ.equals(requestTemp.getOperationType())) {
+                if (ChatOperationType.READ.getDesc().equals(requestTemp.getOperationType())) {
                     updateMessageToReadHandler.handler(session, message, sessions);
                 }
                 // 发送消息
-                if (ChatOperationTypeEnum.SEND.equals(requestTemp.getOperationType())) {
+                if (ChatOperationType.SEND.getDesc().equals(requestTemp.getOperationType())) {
                     sendMessageHandler.handler(session, message, sessions);
                 }
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.groot.business.bean.response.base.WSResponse;
 import com.groot.business.bean.request.base.WSRequest;
-import com.groot.business.bean.ChatOperationTypeEnum;
+import com.groot.business.bean.enums.ChatOperationType;
 import com.groot.business.bean.response.MessageResponse;
 import com.groot.business.bean.response.UnreadMessageCountResponse;
 import com.groot.business.model.User;
@@ -27,14 +27,17 @@ public class SendMessageHandler {
 
     private final MessageService messageService;
 
-    public SendMessageHandler(final MessageService messageService) {
+    private final ObjectMapper objectMapper;
+
+    public SendMessageHandler(final MessageService messageService,
+                              final ObjectMapper objectMapper) {
         this.messageService = messageService;
+        this.objectMapper = objectMapper;
     }
 
     public void handler(WebSocketSession session, WebSocketMessage<?> message,
             CopyOnWriteArraySet<WebSocketSession> sessions) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        WSRequest<ChatOperationTypeEnum, SendMessageParams> request = objectMapper
+        WSRequest<SendMessageParams> request = objectMapper
                 .readValue(
                         (String) message.getPayload(),
                         new TypeReference<>() {
@@ -58,7 +61,7 @@ public class SendMessageHandler {
         session.sendMessage(
                 new TextMessage(objectMapper.writeValueAsString(WSResponse.success(
                         "发送消息成功",
-                        ChatOperationTypeEnum.SEND,
+                        ChatOperationType.SEND,
                         new SendMessageData(friendId, messageResponse, userUnreadMessageCount.get())))));
         sessions.forEach(s -> {
             try {
@@ -67,7 +70,7 @@ public class SendMessageHandler {
                     s.sendMessage(new TextMessage(
                             objectMapper.writeValueAsString(WSResponse.success(
                                     "接收消息成功",
-                                    ChatOperationTypeEnum.SEND,
+                                    ChatOperationType.SEND,
                                     new SendMessageData(userId, messageResponse, friendUnreadMessageCount.get())))));
                 }
             } catch (IOException e) {

@@ -8,7 +8,7 @@ import com.groot.business.model.Friend;
 import java.util.List;
 
 public interface FriendMapper extends BaseMapper<Friend> {
-    List<FriendResponse> listFriend(String userId, String relationStatus);
+    List<FriendResponse> listFriend(String userId, int relationStatus);
 
-    List<FriendWithUnreadMsgCountResponse> listFriendWithUnreadMsgCount(String userId, String readStatus, String relationStatus);
+    List<FriendWithUnreadMsgCountResponse> listFriendWithUnreadMsgCount(String userId, int readStatus, int relationStatus);
 }

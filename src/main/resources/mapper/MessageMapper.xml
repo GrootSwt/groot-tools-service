@@ -31,10 +31,10 @@
         where
             (m.sender_id = #{friendId}
           and m.receiver_id = #{userId}
-          and m.read_status = 'unread')
+          and m.read_status = #{readStatus})
            or (m.sender_id = #{userId}
           and m.receiver_id = #{friendId}
-          and m.read_status = 'unread')
+          and m.read_status = #{readStatus})
         group by
             m.sender_id,
             m.receiver_id
@@ -49,7 +49,7 @@
     </select>
     <update id="updateMessageToRead">
         update message m
-        set m.read_status = 'read'
+        set m.read_status = #{readStatus}
         <where>
             <foreach collection="unreadMessageIds" item="id" index="index" open="m.id in(" separator="," close=")">
                 #{id}

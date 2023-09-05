@@ -1,7 +1,7 @@
 package com.groot.business.utils;
 
 import com.groot.business.exception.WSRuntimeException;
-import com.groot.business.bean.MemorandumOperationTypeEnum;
+import com.groot.business.bean.enums.MemorandumOperationType;
 import com.groot.business.model.User;
 
 import cn.dev33.satoken.stp.StpUtil;
@@ -50,7 +50,7 @@ public class WSUtil {
             log.info(wsName + "心跳检测前连接数量：" + sessions.size());
             while (iterator.hasNext()) {
                 try {
-                    iterator.next().sendMessage(new TextMessage(MemorandumOperationTypeEnum.HEARTBEAT.getValue()));
+                    iterator.next().sendMessage(new TextMessage(MemorandumOperationType.HEARTBEAT.getDesc()));
                 } catch (IOException e) {
                     iterator.remove();
                 }

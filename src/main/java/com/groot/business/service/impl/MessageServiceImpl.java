@@ -1,6 +1,6 @@
 package com.groot.business.service.impl;
 
-import com.groot.business.bean.ReadStatusEnum;
+import com.groot.business.bean.enums.ReadStatus;
 import com.groot.business.bean.response.MessageResponse;
 import com.groot.business.bean.response.MessageListResponse;
 import com.groot.business.bean.response.UnreadMessageCountResponse;
@@ -39,13 +39,13 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<UnreadMessageCountResponse> listUnreadMessageCount(String friendId, String userId) {
-        return messageMapper.listUnreadMessageCount(friendId, userId);
+        return messageMapper.listUnreadMessageCount(ReadStatus.UNREAD.getValue(), friendId, userId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<UnreadMessageCountResponse> updateMessageToRead(List<String> unreadMessageIds, String friendId, String userId) {
-        messageMapper.updateMessageToRead(unreadMessageIds, friendId, userId);
+        messageMapper.updateMessageToRead(ReadStatus.READ.getValue(), unreadMessageIds, friendId, userId);
         return this.listUnreadMessageCount(friendId, userId);
     }
 
@@ -56,7 +56,7 @@ public class MessageServiceImpl implements MessageService {
         message.setSenderId(userId);
         message.setReceiverId(friendId);
         message.setContent(content);
-        message.setReadStatus(ReadStatusEnum.UNREAD);
+        message.setReadStatus(ReadStatus.UNREAD);
         messageMapper.insert(message);
         return new MessageResponse(
                 message.getId(),

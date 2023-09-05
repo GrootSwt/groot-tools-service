@@ -3,9 +3,9 @@ package com.groot.business.bean.request.base;
 import lombok.Data;
 
 @Data
-public class WSRequest<O, P> {
+public class WSRequest<P> {
 
-  private O operationType;
+  private String operationType;
 
   private P params;
   
