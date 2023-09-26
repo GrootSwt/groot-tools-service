@@ -1,40 +1,36 @@
-{"properties": [
-  {
-    "name": "application.datasource.url",
-    "type": "java.lang.String",
-    "description": "A description for 'application.datasource.url'"
-  },
-  {
-    "name": "application.datasource.username",
-    "type": "java.lang.String",
-    "description": "A description for 'application.datasource.username'"
-  },
-  {
-    "name": "application.datasource.password",
-    "type": "java.lang.String",
-    "description": "A description for 'application.datasource.password'"
-  },
-  {
-    "name": "application.redis.host",
-    "type": "java.lang.String",
-    "description": "A description for 'application.redis.host'"
-  },
-  {
-    "name": "application.redis.port",
-    "type": "java.lang.String",
-    "description": "A description for 'application.redis.port'"
-  },
-  {
-    "name": "application.sa-token.jwt-secret-key",
-    "type": "java.lang.String",
-    "description": "A description for 'application.sa-token.jwt-secret-key'"
-  },
-  {
-    "name": "website.name",
-    "type": "java.lang.String"
-  },
-  {
-    "name": "website.location",
-    "type": "java.lang.String"
-  }
-]}
+{
+  "properties": [
+    {
+      "name": "application.datasource.url",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "application.datasource.username",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "application.datasource.password",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "application.redis.host",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "application.redis.port",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "application.sa-token.jwt-secret-key",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "website.name",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "website.location",
+      "type": "java.lang.String"
+    }
+  ]
+}

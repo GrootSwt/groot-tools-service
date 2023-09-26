@@ -11,6 +11,7 @@ import com.groot.business.utils.WSUtil;
 import com.groot.business.ws.handler.MemorandumAppendHandler;
 
 import cn.dev33.satoken.stp.StpUtil;
+import io.micrometer.common.lang.NonNullApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Slf4j
 @Component
+@NonNullApi
 public class Memorandum implements WebSocketHandler {
 
     private static final AtomicInteger sessionNumber = new AtomicInteger(0);
