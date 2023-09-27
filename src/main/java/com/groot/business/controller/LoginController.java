@@ -25,7 +25,7 @@ public class LoginController {
     }
 
     @PostMapping(value = "/login")
-    public Response<UserResponse> login(@Validated @RequestBody LoginRequest request, HttpServletResponse response) {
+    public Response<UserResponse> login(@Validated @RequestBody LoginRequest request) {
         UserResponse userResponse = userService.getUserByAccountAndPassword(request.getAccount(), request.getPassword());
         StpUtil.login(userResponse.getId(),
                 SaLoginConfig

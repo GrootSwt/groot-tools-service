@@ -1,12 +1,13 @@
 package com.groot.business.controller;
 
+import com.groot.business.bean.response.MemorandumResponse;
 import com.groot.business.bean.response.base.Response;
-import com.groot.business.model.Memorandum;
 import com.groot.business.service.MemorandumService;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,8 +24,8 @@ public class MemorandumController {
     }
 
     @GetMapping(value = "/listMemorandum")
-    public Response<List<Memorandum>> list() {
-        List<Memorandum> memorandums = memorandumService.list();
+    public Response<List<MemorandumResponse>> list() {
+        List<MemorandumResponse> memorandums = memorandumService.list();
         return Response.success("获取备忘录列表成功！", memorandums);
     }
 
@@ -35,4 +36,9 @@ public class MemorandumController {
         return Response.success("删除成功");
     }
 
+    @PostMapping(value = "uploadFile")
+    public Response<Void> uploadFile(MultipartFile file) throws IOException {
+        memorandumService.uploadFile(file);
+        return Response.success("文件上传成功");
+    }
 }

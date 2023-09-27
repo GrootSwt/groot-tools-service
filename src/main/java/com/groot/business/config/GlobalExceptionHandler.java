@@ -9,6 +9,7 @@ import cn.dev33.satoken.exception.NotLoginException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -24,6 +25,7 @@ import java.util.List;
  */
 @ControllerAdvice
 @RestController
+@Slf4j
 public class GlobalExceptionHandler {
 
     private final ObjectMapper objectMapper;
@@ -39,14 +41,14 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = BusinessRuntimeException.class)
     public Response<Void> exceptionHandler(HttpServletResponse response, BusinessRuntimeException e) {
-        e.printStackTrace();
+        log.error(e.getMessage(), e);
         response.setStatus(e.getStatus());
         return Response.failure(e.getMessage());
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public Response<Void> exceptionHandler(HttpServletResponse response, MethodArgumentNotValidException e) {
-        e.printStackTrace();
+        log.error(e.getMessage(), e);
         response.setStatus(400);
         int errorCount = e.getBindingResult().getErrorCount();
         if (0 != errorCount) {
@@ -73,14 +75,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = NotLoginException.class)
     public Response<Void> exceptionHandler(HttpServletResponse response, NotLoginException e) {
-        e.printStackTrace();
+        log.error(e.getMessage(), e);
         response.setStatus(401);
         return Response.failure("登陆状态异常，请重新登录");
     }
 
     @ExceptionHandler(value = Exception.class)
     public Response<Void> exceptionHandler(HttpServletResponse response, Exception e) {
-        e.printStackTrace();
+        log.error(e.getMessage(), e);
         response.setStatus(500);
         return Response.failure("服务器出现异常");
     }

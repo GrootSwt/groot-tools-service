@@ -1,0 +1,24 @@
+# 应用配置
+application:
+  # 数据库配置
+  datasource:
+    # 数据库URL
+    url:
+    # 数据库账号
+    username:
+    # 数据库密码
+    password:
+  # redis配置
+  redis:
+    host:
+    port:
+  # sa-token配置
+  sa-token:
+    jwt-secret-key:
+  # 邮件配置
+  mail:
+    host:
+    port:
+    username:
+    password:
+  file-root-path:

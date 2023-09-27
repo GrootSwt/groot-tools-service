@@ -3,6 +3,7 @@ package com.groot.business.ws.handler;
 import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import com.groot.business.bean.enums.MemorandumContentType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
@@ -44,6 +45,7 @@ public class MemorandumAppendHandler {
         Memorandum data = new Memorandum();
         data.setUserId(user.getId());
         data.setContent(request.getParams().getContent());
+        data.setContentType(MemorandumContentType.TEXT);
         memorandumService.save(data);
         log.info(user.getDisplayName() + "群发备忘录：" + message.getPayload());
         sessions.forEach(s -> {

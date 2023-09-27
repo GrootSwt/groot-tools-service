@@ -25,6 +25,26 @@
       "type": "java.lang.String"
     },
     {
+      "name": "application.mail.host",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "application.mail.port",
+      "type": "java.lang.Integer"
+    },
+    {
+      "name": "application.mail.username",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "application.mail.password",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "application.file-root-path",
+      "type": "java.lang.String"
+    },
+    {
       "name": "website.name",
       "type": "java.lang.String"
     },

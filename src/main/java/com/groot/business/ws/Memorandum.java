@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.groot.business.bean.request.base.WSRequest;
+import com.groot.business.bean.response.MemorandumResponse;
 import com.groot.business.bean.response.base.WSResponse;
 import com.groot.business.bean.enums.MemorandumOperationType;
 import com.groot.business.model.User;
@@ -95,7 +96,7 @@ public class Memorandum implements WebSocketHandler {
         WSUtil.heartbeat(sessions, sessionNumber, "备忘录服务");
     }
 
-    public static void sendAll(List<com.groot.business.model.Memorandum> memorandums) throws IOException {
+    public static void sendAll(List<MemorandumResponse> memorandums) throws IOException {
         String userId = StpUtil.getLoginIdAsString();
         for (WebSocketSession session : sessions) {
             if (WSUtil.getUserFromProtocols(session).getId().equals(userId)) {

@@ -16,12 +16,4 @@ public class Jackson2Config {
                         SerializationFeature.WRITE_ENUMS_USING_TO_STRING
                 );
     }
-
-    @Bean
-    public ObjectMapper getObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
-        return objectMapper;
-    }
-
 }

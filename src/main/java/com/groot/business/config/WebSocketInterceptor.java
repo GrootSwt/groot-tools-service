@@ -19,17 +19,23 @@ public class WebSocketInterceptor implements HandshakeInterceptor {
 
     @Override
     @SaCheckLogin
-    public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
+    public boolean beforeHandshake(ServerHttpRequest request,
+                                   ServerHttpResponse response,
+                                   WebSocketHandler wsHandler,
+                                   Map<String, Object> attributes) {
         List<String> protocolList = request.getHeaders().get("Sec-WebSocket-Protocol");
         if (null != protocolList && !protocolList.isEmpty()) {
             response.getHeaders().add("Sec-WebSocket-Protocol", protocolList.get(0));
-            return  true;
+            return true;
         }
         return false;
     }
 
     @Override
-    public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, @Nullable Exception exception) {
+    public void afterHandshake(ServerHttpRequest request,
+                               ServerHttpResponse response,
+                               WebSocketHandler wsHandler,
+                               @Nullable Exception exception) {
 
     }
 }

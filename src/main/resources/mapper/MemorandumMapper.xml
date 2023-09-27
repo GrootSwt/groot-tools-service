@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.groot.business.mapper.MemorandumMapper">
+    <resultMap id="MemorandumAndFile" type="com.groot.business.bean.entity.MemorandumAndFile">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="content" property="content" />
+        <result column="content_type" property="contentType" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="file_id" property="fileId" />
+        <result column="original_name" property="fileOriginalName" />
+        <result column="file_create_time" property="fileCreateTime" />
+        <result column="file_update_time" property="fileUpdateTime" />
+        <result column="file_deleted" property="fileDeleted" />
+    </resultMap>
+    <select id="listByUserId" resultMap="MemorandumAndFile">
+        select m.*,
+               f.id          as file_id,
+               f.original_name,
+               f.create_time as file_create_time,
+               f.update_time as file_update_time,
+               f.deleted     as file_deleted
+        from memorandum m
+                 left join file f on m.content_type = 2 and m.content = f.id
+        where m.user_id = #{userId}
+          and m.deleted = false
+    </select>
+    <select id="listUnreadMessageCount"
+            resultType="com.groot.business.bean.response.UnreadMessageCountResponse">
+        select m.sender_id,
+               m.receiver_id,
+               count(m.sender_id) as count
+        from
+            message m
+        where
+            (m.sender_id = #{friendId}
+          and m.receiver_id = #{userId}
+          and m.read_status = #{readStatus})
+           or (m.sender_id = #{userId}
+          and m.receiver_id = #{friendId}
+          and m.read_status = #{readStatus})
+        group by
+            m.sender_id,
+            m.receiver_id
+    </select>
+    <select id="listMessageRowNumberById" resultType="java.lang.Long">
+        select row_num
+        from (select m.id, row_number() over(order by m.create_time desc) row_num
+              from message m
+              where (m.sender_id = #{userId} and m.receiver_id = #{friendId})
+                 or (m.sender_id = #{friendId} and m.receiver_id = #{userId})) m
+        where m.id = #{prevMessageId}
+    </select>
+    <update id="updateMessageToRead">
+        update message m
+        set m.read_status = #{readStatus}
+        <where>
+            <foreach collection="unreadMessageIds" item="id" index="index" open="m.id in(" separator="," close=")">
+                #{id}
+            </foreach>
+            and m.sender_id = #{friendId}
+            and m.receiver_id = #{userId}
+        </where>
+    </update>
+</mapper>

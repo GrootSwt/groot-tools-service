@@ -1,5 +1,6 @@
 package com.groot.business.model;
 
+import com.groot.business.bean.enums.MemorandumContentType;
 import com.groot.business.model.base.BaseModel;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -20,4 +21,5 @@ public class Memorandum extends BaseModel {
     @Length(min = 1, max = 2000, message = "备忘录内容长度位于1～2000之间")
     private String content;
 
+    private MemorandumContentType contentType;
 }
