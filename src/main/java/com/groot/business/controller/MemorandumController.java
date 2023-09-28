@@ -25,7 +25,7 @@ public class MemorandumController {
 
     @GetMapping(value = "/listMemorandum")
     public Response<List<MemorandumResponse>> list() {
-        List<MemorandumResponse> memorandums = memorandumService.list();
+        List<MemorandumResponse> memorandums = memorandumService.list(null);
         return Response.success("获取备忘录列表成功！", memorandums);
     }
 

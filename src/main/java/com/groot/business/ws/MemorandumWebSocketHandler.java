@@ -8,6 +8,7 @@ import com.groot.business.bean.response.MemorandumResponse;
 import com.groot.business.bean.response.base.WSResponse;
 import com.groot.business.bean.enums.MemorandumOperationType;
 import com.groot.business.model.User;
+import com.groot.business.service.MemorandumService;
 import com.groot.business.utils.WSUtil;
 import com.groot.business.ws.handler.MemorandumAppendHandler;
 
@@ -20,6 +21,7 @@ import org.springframework.web.socket.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,7 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @Component
 @NonNullApi
-public class Memorandum implements WebSocketHandler {
+public class MemorandumWebSocketHandler implements WebSocketHandler {
 
     private static final AtomicInteger sessionNumber = new AtomicInteger(0);
 
@@ -39,9 +41,14 @@ public class Memorandum implements WebSocketHandler {
 
     private final ObjectMapper objectMapper;
 
-    public Memorandum(final MemorandumAppendHandler memorandumAppendHandler, final ObjectMapper objectMapper) {
+
+    public MemorandumWebSocketHandler(final MemorandumAppendHandler memorandumAppendHandler, final ObjectMapper objectMapper) {
         this.memorandumAppendHandler = memorandumAppendHandler;
         this.objectMapper = objectMapper;
+    }
+
+    public CopyOnWriteArraySet<WebSocketSession> getSessions() {
+        return sessions;
     }
 
     @Override
@@ -94,18 +101,6 @@ public class Memorandum implements WebSocketHandler {
 
     public static void heartbeat() {
         WSUtil.heartbeat(sessions, sessionNumber, "备忘录服务");
-    }
-
-    public static void sendAll(List<MemorandumResponse> memorandums) throws IOException {
-        String userId = StpUtil.getLoginIdAsString();
-        for (WebSocketSession session : sessions) {
-            if (WSUtil.getUserFromProtocols(session).getId().equals(userId)) {
-                ObjectMapper currentObjectMapper = new ObjectMapper();
-                currentObjectMapper.configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
-                session.sendMessage(new TextMessage(currentObjectMapper.writeValueAsString(
-                        WSResponse.success("获取消息列表成功", MemorandumOperationType.REPLACE, memorandums))));
-            }
-        }
     }
 
 }

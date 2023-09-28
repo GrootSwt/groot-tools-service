@@ -9,4 +9,6 @@ import java.util.List;
 public interface MemorandumMapper extends BaseMapper<Memorandum> {
 
     List<MemorandumAndFile> listByUserId(String userId);
+
+    List<Memorandum> listOutdatedFileTypeMemorandum();
 }

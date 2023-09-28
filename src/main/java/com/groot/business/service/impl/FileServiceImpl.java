@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -53,5 +54,10 @@ public class FileServiceImpl implements FileService {
             throw new BusinessRuntimeException("文件不存在", 404);
         }
         return fileModel;
+    }
+
+    @Override
+    public List<FileModel> listByFilesList(List<String> fileIds) {
+        return fileMapper.selectBatchIds(fileIds);
     }
 }

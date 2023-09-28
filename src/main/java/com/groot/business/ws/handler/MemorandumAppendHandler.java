@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.groot.business.bean.enums.MemorandumContentType;
+import com.groot.business.mapper.MemorandumMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
@@ -26,12 +27,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MemorandumAppendHandler {
 
-    private final MemorandumService memorandumService;
+    private final MemorandumMapper memorandumMapper;
 
     private final ObjectMapper objectMapper;
 
-    public MemorandumAppendHandler(final MemorandumService memorandumService, final ObjectMapper objectMapper) {
-        this.memorandumService = memorandumService;
+    public MemorandumAppendHandler(final MemorandumMapper memorandumMapper, final ObjectMapper objectMapper) {
+        this.memorandumMapper = memorandumMapper;
         this.objectMapper = objectMapper;
     }
 
@@ -46,7 +47,7 @@ public class MemorandumAppendHandler {
         data.setUserId(user.getId());
         data.setContent(request.getParams().getContent());
         data.setContentType(MemorandumContentType.TEXT);
-        memorandumService.save(data);
+        memorandumMapper.insert(data);
         log.info(user.getDisplayName() + "群发备忘录：" + message.getPayload());
         sessions.forEach(s -> {
             try {
@@ -55,7 +56,7 @@ public class MemorandumAppendHandler {
                             WSResponse.success("添加备忘录成功", MemorandumOperationType.APPEND, data))));
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e.getMessage(), e);
             }
         });
     }

@@ -12,7 +12,7 @@ create table friend
 )
     comment '好友';
 
-create table memorandum
+create table memorandumWebSocketHandler
 (
     id          varchar(20)      not null
         primary key,

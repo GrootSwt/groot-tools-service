@@ -65,4 +65,11 @@
             and m.receiver_id = #{userId}
         </where>
     </update>
+    <select id="listOutdatedFileTypeMemorandum" resultType="com.groot.business.model.Memorandum">
+        select *
+        from memorandum
+        where deleted = false
+          and content_type = 2
+          and unix_timestamp(now()) - unix_timestamp(create_time) > 2 * 24 * 60 * 60
+    </select>
 </mapper>

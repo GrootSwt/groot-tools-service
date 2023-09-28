@@ -1,10 +1,13 @@
 package com.groot.business.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.groot.business.bean.entity.MemorandumAndFile;
 import com.groot.business.bean.enums.MemorandumContentType;
+import com.groot.business.bean.enums.MemorandumOperationType;
 import com.groot.business.bean.response.FileResponse;
 import com.groot.business.bean.response.MemorandumResponse;
+import com.groot.business.bean.response.base.WSResponse;
 import com.groot.business.exception.BusinessRuntimeException;
 import com.groot.business.mapper.FileMapper;
 import com.groot.business.mapper.MemorandumMapper;
@@ -16,17 +19,25 @@ import com.groot.business.service.MemorandumService;
 import cn.dev33.satoken.stp.StpUtil;
 
 import com.groot.business.utils.CommonUtil;
+import com.groot.business.utils.WSUtil;
+import com.groot.business.ws.MemorandumWebSocketHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class MemorandumServiceImpl implements MemorandumService {
 
@@ -36,17 +47,23 @@ public class MemorandumServiceImpl implements MemorandumService {
 
     private final FileMapper fileMapper;
 
+    private final MemorandumWebSocketHandler memorandumWebSocketHandler;
+
     public MemorandumServiceImpl(final MemorandumMapper memorandumMapper,
                                  final FileService fileService,
-                                 final FileMapper fileMapper) {
+                                 final FileMapper fileMapper,
+                                 final MemorandumWebSocketHandler memorandumWebSocketHandler) {
         this.memorandumMapper = memorandumMapper;
         this.fileService = fileService;
         this.fileMapper = fileMapper;
+        this.memorandumWebSocketHandler = memorandumWebSocketHandler;
     }
 
     @Override
-    public List<MemorandumResponse> list() {
-        String userId = StpUtil.getLoginIdAsString();
+    public List<MemorandumResponse> list(String userId) {
+        if (userId == null) {
+            userId = StpUtil.getLoginIdAsString();
+        }
         List<MemorandumAndFile> memorandumAndFileList = memorandumMapper.listByUserId(userId);
         List<MemorandumResponse> memorandumResponseList = new ArrayList<>();
         memorandumAndFileList.forEach(item -> {
@@ -102,8 +119,8 @@ public class MemorandumServiceImpl implements MemorandumService {
             }
             memorandumMapper.deleteById(id);
         }
-        List<MemorandumResponse> memorandums = this.list();
-        com.groot.business.ws.Memorandum.sendAll(memorandums);
+        List<MemorandumResponse> memorandums = this.list(null);
+        this.sendAll(memorandums);
     }
 
     @Override
@@ -116,7 +133,59 @@ public class MemorandumServiceImpl implements MemorandumService {
         memorandum.setContent(fileModel.getId());
         memorandum.setContentType(MemorandumContentType.FILE);
         memorandumMapper.insert(memorandum);
-        List<MemorandumResponse> memorandums = this.list();
-        com.groot.business.ws.Memorandum.sendAll(memorandums);
+        List<MemorandumResponse> memorandums = this.list(null);
+        this.sendAll(memorandums);
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void autoDeleteOutdatedFileTypeMemorandum() throws IOException {
+        List<Memorandum> memorandumList = memorandumMapper.listOutdatedFileTypeMemorandum();
+        if (!memorandumList.isEmpty()) {
+            Set<String> userIdSet = memorandumList.stream().map(Memorandum::getUserId).collect(Collectors.toSet());
+            List<String> fileIdList = memorandumList.stream().map(Memorandum::getContent).toList();
+            List<FileModel> fileModelList = fileMapper.selectBatchIds(fileIdList);
+            fileMapper.deleteBatchIds(fileIdList);
+            List<String> memorandumIdList = memorandumList.stream().map(Memorandum::getId).toList();
+            memorandumMapper.deleteBatchIds(memorandumIdList);
+            fileModelList.forEach(fileModel -> {
+                CommonUtil.deleteFile(Paths.get(fileModel.getLocationUrl()));
+            });
+            this.sendAllByUserIds(userIdSet);
+        }
+        log.info("备忘录过期文件自动删除成功，删除文件数量：{}", memorandumList.size());
+    }
+
+    @Override
+    public List<MemorandumResponse> listByUserId(String sessionUserId) {
+        return list(sessionUserId);
+    }
+
+    private void sendAll(List<MemorandumResponse> memorandums) throws IOException {
+        String userId = StpUtil.getLoginIdAsString();
+        CopyOnWriteArraySet<WebSocketSession> sessions = memorandumWebSocketHandler.getSessions();
+        for (WebSocketSession session : sessions) {
+            if (WSUtil.getUserFromProtocols(session).getId().equals(userId)) {
+                ObjectMapper currentObjectMapper = new ObjectMapper();
+                currentObjectMapper.configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
+                session.sendMessage(new TextMessage(currentObjectMapper.writeValueAsString(
+                        WSResponse.success("获取消息列表成功", MemorandumOperationType.REPLACE, memorandums))));
+            }
+        }
+    }
+
+    private void sendAllByUserIds(Set<String> userIdSet) throws IOException {
+        CopyOnWriteArraySet<WebSocketSession> sessions = memorandumWebSocketHandler.getSessions();
+        for (WebSocketSession session : sessions) {
+            String sessionUserId = WSUtil.getUserFromProtocols(session).getId();
+            if (userIdSet.contains(sessionUserId)) {
+                List<MemorandumResponse> memorandumResponseList = this.listByUserId(sessionUserId);
+                ObjectMapper currentObjectMapper = new ObjectMapper();
+                currentObjectMapper.configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
+                session.sendMessage(new TextMessage(currentObjectMapper.writeValueAsString(
+                        WSResponse.success("获取消息列表成功", MemorandumOperationType.REPLACE, memorandumResponseList))));
+            }
+        }
+    }
+
 }

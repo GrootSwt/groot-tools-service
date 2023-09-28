@@ -9,10 +9,14 @@ import java.util.List;
 
 public interface MemorandumService {
 
-    List<MemorandumResponse> list();
+    List<MemorandumResponse> list(String userId);
     void save(Memorandum memorandum);
 
     void deleteById(String id) throws IOException;
 
     void uploadFile(MultipartFile file) throws IOException;
+
+    void autoDeleteOutdatedFileTypeMemorandum() throws IOException;
+
+    List<MemorandumResponse> listByUserId(String sessionUserId);
 }
