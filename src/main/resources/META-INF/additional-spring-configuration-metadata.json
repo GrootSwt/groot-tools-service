@@ -45,11 +45,11 @@
       "type": "java.lang.String"
     },
     {
-      "name": "website.name",
+      "name": "application.website.name",
       "type": "java.lang.String"
     },
     {
-      "name": "website.location",
+      "name": "application.website.location",
       "type": "java.lang.String"
     }
   ]

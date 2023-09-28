@@ -17,9 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class RegisterServiceImpl implements RegisterService {
 
-    @Value("{website.name}")
+    @Value("{application.website.name}")
     private String websiteName;
-    @Value("{website.location}")
+    @Value("{application.website.location}")
     private String websiteLocation;
 
     private final RegisterMapper registerMapper;
