@@ -1,7 +1,7 @@
 package com.groot.business.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.groot.business.bean.entity.MemorandumAndFile;
 import com.groot.business.bean.enums.MemorandumContentType;
 import com.groot.business.bean.enums.MemorandumOperationType;
@@ -15,9 +15,6 @@ import com.groot.business.model.FileModel;
 import com.groot.business.model.Memorandum;
 import com.groot.business.service.FileService;
 import com.groot.business.service.MemorandumService;
-
-import cn.dev33.satoken.stp.StpUtil;
-
 import com.groot.business.utils.CommonUtil;
 import com.groot.business.utils.WSUtil;
 import com.groot.business.ws.MemorandumHandler;
@@ -49,14 +46,17 @@ public class MemorandumServiceImpl implements MemorandumService {
 
     private final MemorandumHandler memorandumHandler;
 
+    private final ObjectMapper objectMapper;
     public MemorandumServiceImpl(final MemorandumMapper memorandumMapper,
                                  final FileService fileService,
                                  final FileMapper fileMapper,
-                                 final MemorandumHandler memorandumHandler) {
+                                 final MemorandumHandler memorandumHandler,
+                                 final ObjectMapper objectMapper) {
         this.memorandumMapper = memorandumMapper;
         this.fileService = fileService;
         this.fileMapper = fileMapper;
         this.memorandumHandler = memorandumHandler;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -166,9 +166,7 @@ public class MemorandumServiceImpl implements MemorandumService {
         CopyOnWriteArraySet<WebSocketSession> sessions = memorandumHandler.getSessions();
         for (WebSocketSession session : sessions) {
             if (WSUtil.getUserFromProtocols(session).getId().equals(userId)) {
-                ObjectMapper currentObjectMapper = new ObjectMapper();
-                currentObjectMapper.configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
-                session.sendMessage(new TextMessage(currentObjectMapper.writeValueAsString(
+                session.sendMessage(new TextMessage(objectMapper.writeValueAsString(
                         WSResponse.success("获取消息列表成功", MemorandumOperationType.REPLACE, memorandums))));
             }
         }
@@ -180,9 +178,7 @@ public class MemorandumServiceImpl implements MemorandumService {
             String sessionUserId = WSUtil.getUserFromProtocols(session).getId();
             if (userIdSet.contains(sessionUserId)) {
                 List<MemorandumResponse> memorandumResponseList = this.listByUserId(sessionUserId);
-                ObjectMapper currentObjectMapper = new ObjectMapper();
-                currentObjectMapper.configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
-                session.sendMessage(new TextMessage(currentObjectMapper.writeValueAsString(
+                session.sendMessage(new TextMessage(objectMapper.writeValueAsString(
                         WSResponse.success("获取消息列表成功", MemorandumOperationType.REPLACE, memorandumResponseList))));
             }
         }
