@@ -1,7 +1,7 @@
 package com.groot.business.config;
 
-import com.groot.business.ws.Chat;
-import com.groot.business.ws.MemorandumWebSocketHandler;
+import com.groot.business.ws.ChatHandler;
+import com.groot.business.ws.MemorandumHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -11,22 +11,22 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    private final MemorandumWebSocketHandler memorandumWebSocketHandler;
+    private final MemorandumHandler memorandumHandler;
 
-    private final Chat chat;
+    private final ChatHandler chatHandler;
 
     private final WebSocketInterceptor webSocketInterceptor;
 
-    public WebSocketConfig(final MemorandumWebSocketHandler memorandumWebSocketHandler, final WebSocketInterceptor webSocketInterceptor, final Chat chat) {
-        this.memorandumWebSocketHandler = memorandumWebSocketHandler;
-        this.chat = chat;
+    public WebSocketConfig(final MemorandumHandler memorandumHandler, final WebSocketInterceptor webSocketInterceptor, final ChatHandler chatHandler) {
+        this.memorandumHandler = memorandumHandler;
+        this.chatHandler = chatHandler;
         this.webSocketInterceptor = webSocketInterceptor;
     }
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(memorandumWebSocketHandler, "/ws/memorandum")
-                .addHandler(chat, "/ws/chat")
+        registry.addHandler(memorandumHandler, "/ws/memorandum")
+                .addHandler(chatHandler, "/ws/chat")
                 .addInterceptors(webSocketInterceptor)
                 .setAllowedOrigins("*");
     }

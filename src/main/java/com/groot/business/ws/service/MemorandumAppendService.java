@@ -1,42 +1,41 @@
-package com.groot.business.ws.handler;
+package com.groot.business.ws.service;
 
-import java.io.IOException;
-import java.util.concurrent.CopyOnWriteArraySet;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.groot.business.bean.enums.MemorandumContentType;
+import com.groot.business.bean.enums.MemorandumOperationType;
+import com.groot.business.bean.request.base.WSRequest;
+import com.groot.business.bean.response.base.WSResponse;
 import com.groot.business.mapper.MemorandumMapper;
+import com.groot.business.model.Memorandum;
+import com.groot.business.model.User;
+import com.groot.business.utils.WSUtil;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.groot.business.bean.request.base.WSRequest;
-import com.groot.business.bean.response.base.WSResponse;
-import com.groot.business.bean.enums.MemorandumOperationType;
-import com.groot.business.model.Memorandum;
-import com.groot.business.model.User;
-import com.groot.business.service.MemorandumService;
-import com.groot.business.utils.WSUtil;
-
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 @Component
 @Slf4j
-public class MemorandumAppendHandler {
+public class MemorandumAppendService {
 
     private final MemorandumMapper memorandumMapper;
 
     private final ObjectMapper objectMapper;
 
-    public MemorandumAppendHandler(final MemorandumMapper memorandumMapper, final ObjectMapper objectMapper) {
+    public MemorandumAppendService(final MemorandumMapper memorandumMapper, final ObjectMapper objectMapper) {
         this.memorandumMapper = memorandumMapper;
         this.objectMapper = objectMapper;
     }
 
-    public void handler(User user, WebSocketSession session, WebSocketMessage<?> message,
+    @Transactional(rollbackFor = Exception.class)
+    public void handler(User user, WebSocketMessage<?> message,
                         CopyOnWriteArraySet<WebSocketSession> sessions) throws IOException {
         WSRequest<MemorandumAppendParams> request = objectMapper.readValue(
                 (String) message.getPayload(),

@@ -1,4 +1,4 @@
-package com.groot.business.ws.handler;
+package com.groot.business.ws.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +12,7 @@ import com.groot.business.service.MessageService;
 import com.groot.business.utils.WSUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
@@ -22,14 +23,15 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicReference;
 
+@Slf4j
 @Component
-public class SendMessageHandler {
+public class SendMessageService {
 
     private final MessageService messageService;
 
     private final ObjectMapper objectMapper;
 
-    public SendMessageHandler(final MessageService messageService,
+    public SendMessageService(final MessageService messageService,
                               final ObjectMapper objectMapper) {
         this.messageService = messageService;
         this.objectMapper = objectMapper;
@@ -74,7 +76,7 @@ public class SendMessageHandler {
                                     new SendMessageData(userId, messageResponse, friendUnreadMessageCount.get())))));
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e.getMessage());
             }
         });
     }

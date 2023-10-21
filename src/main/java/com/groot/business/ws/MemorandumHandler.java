@@ -2,26 +2,19 @@ package com.groot.business.ws;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.groot.business.bean.request.base.WSRequest;
-import com.groot.business.bean.response.MemorandumResponse;
-import com.groot.business.bean.response.base.WSResponse;
 import com.groot.business.bean.enums.MemorandumOperationType;
 import com.groot.business.model.User;
-import com.groot.business.service.MemorandumService;
 import com.groot.business.utils.WSUtil;
-import com.groot.business.ws.handler.MemorandumAppendHandler;
+import com.groot.business.ws.service.MemorandumAppendService;
 
-import cn.dev33.satoken.stp.StpUtil;
 import io.micrometer.common.lang.NonNullApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,19 +24,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @Component
 @NonNullApi
-public class MemorandumWebSocketHandler implements WebSocketHandler {
+public class MemorandumHandler implements WebSocketHandler {
 
     private static final AtomicInteger sessionNumber = new AtomicInteger(0);
 
     private static final CopyOnWriteArraySet<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
 
-    private final MemorandumAppendHandler memorandumAppendHandler;
+    private final MemorandumAppendService memorandumAppendService;
 
     private final ObjectMapper objectMapper;
 
 
-    public MemorandumWebSocketHandler(final MemorandumAppendHandler memorandumAppendHandler, final ObjectMapper objectMapper) {
-        this.memorandumAppendHandler = memorandumAppendHandler;
+    public MemorandumHandler(final MemorandumAppendService memorandumAppendService, final ObjectMapper objectMapper) {
+        this.memorandumAppendService = memorandumAppendService;
         this.objectMapper = objectMapper;
     }
 
@@ -75,7 +68,7 @@ public class MemorandumWebSocketHandler implements WebSocketHandler {
                         });
                 // 追加
                 if (MemorandumOperationType.APPEND.getDesc().equals(request.getOperationType())) {
-                    memorandumAppendHandler.handler(user, session, message, sessions);
+                    memorandumAppendService.handler(user, message, sessions);
                 }
             }
 

@@ -1,36 +1,36 @@
-package com.groot.business.ws.handler;
+package com.groot.business.ws.service;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.groot.business.bean.enums.ChatOperationType;
+import com.groot.business.bean.request.base.WSRequest;
+import com.groot.business.bean.response.UnreadMessageCountResponse;
+import com.groot.business.bean.response.base.WSResponse;
+import com.groot.business.model.User;
+import com.groot.business.service.MessageService;
+import com.groot.business.utils.WSUtil;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketMessage;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.groot.business.bean.response.UnreadMessageCountResponse;
-import org.springframework.stereotype.Component;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketMessage;
-import org.springframework.web.socket.WebSocketSession;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.groot.business.bean.response.base.WSResponse;
-import com.groot.business.bean.request.base.WSRequest;
-import com.groot.business.bean.enums.ChatOperationType;
-import com.groot.business.model.User;
-import com.groot.business.service.MessageService;
-import com.groot.business.utils.WSUtil;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
+@Slf4j
 @Component
-public class UpdateMessageToReadHandler {
+public class UpdateMessageToReadService {
 
     private final MessageService messageService;
 
     private final ObjectMapper objectMapper;
 
-    public UpdateMessageToReadHandler(final MessageService messageService,
+    public UpdateMessageToReadService(final MessageService messageService,
                                       final ObjectMapper objectMapper) {
         this.messageService = messageService;
         this.objectMapper = objectMapper;
@@ -72,7 +72,7 @@ public class UpdateMessageToReadHandler {
                             new UpdateMessageToReadData(userId, unreadMessageIds, friendUnreadMessageCount.get())))));
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e.getMessage());
             }
         });
     }
@@ -89,7 +89,8 @@ class UpdateMessageToReadData {
 }
 
 @Data
-class UpdateMessageToReadParams {
+class
+UpdateMessageToReadParams {
     private String friendId;
     private List<String> unreadMessageIds;
 }

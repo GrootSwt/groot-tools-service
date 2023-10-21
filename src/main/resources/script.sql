@@ -12,15 +12,16 @@ create table friend
 )
     comment '好友';
 
-create table memorandumWebSocketHandler
+create table memorandumHandler
 (
-    id          varchar(20)      not null
+    id           varchar(20)      not null
         primary key,
-    user_id     varchar(20)      not null comment '用户id',
-    content     varchar(2000)    not null comment '内容',
-    create_time datetime         not null comment '创建时间',
-    update_time datetime         not null comment '更新时间',
-    deleted     bit default b'0' not null comment '删除标志'
+    user_id      varchar(20)      not null comment '用户id',
+    content      varchar(2000)    not null comment '内容',
+    content_type tinyint          not null comment '内容类型（1:文本；2:文件）',
+    create_time  datetime         not null comment '创建时间',
+    update_time  datetime         not null comment '更新时间',
+    deleted      bit default b'0' not null comment '删除标志'
 )
     comment '备忘录';
 
@@ -67,5 +68,17 @@ create table user
     deleted      bit default b'0' not null comment '删除标志'
 )
     comment '用户';
+
+create table file
+(
+    id            varchar(20)  not null,
+    original_name varchar(200) not null comment '文件原始名',
+    location_url  varchar(500) not null comment '位置绝对路径',
+    create_time   datetime     not null comment '创建时间',
+    update_time   datetime     not null comment '更新时间',
+    deleted       bit          not null comment '删除标志'
+)
+    comment '文件';
+
 
 

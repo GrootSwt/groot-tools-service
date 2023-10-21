@@ -20,7 +20,7 @@ import cn.dev33.satoken.stp.StpUtil;
 
 import com.groot.business.utils.CommonUtil;
 import com.groot.business.utils.WSUtil;
-import com.groot.business.ws.MemorandumWebSocketHandler;
+import com.groot.business.ws.MemorandumHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,16 +47,16 @@ public class MemorandumServiceImpl implements MemorandumService {
 
     private final FileMapper fileMapper;
 
-    private final MemorandumWebSocketHandler memorandumWebSocketHandler;
+    private final MemorandumHandler memorandumHandler;
 
     public MemorandumServiceImpl(final MemorandumMapper memorandumMapper,
                                  final FileService fileService,
                                  final FileMapper fileMapper,
-                                 final MemorandumWebSocketHandler memorandumWebSocketHandler) {
+                                 final MemorandumHandler memorandumHandler) {
         this.memorandumMapper = memorandumMapper;
         this.fileService = fileService;
         this.fileMapper = fileMapper;
-        this.memorandumWebSocketHandler = memorandumWebSocketHandler;
+        this.memorandumHandler = memorandumHandler;
     }
 
     @Override
@@ -163,7 +163,7 @@ public class MemorandumServiceImpl implements MemorandumService {
 
     private void sendAll(List<MemorandumResponse> memorandums) throws IOException {
         String userId = StpUtil.getLoginIdAsString();
-        CopyOnWriteArraySet<WebSocketSession> sessions = memorandumWebSocketHandler.getSessions();
+        CopyOnWriteArraySet<WebSocketSession> sessions = memorandumHandler.getSessions();
         for (WebSocketSession session : sessions) {
             if (WSUtil.getUserFromProtocols(session).getId().equals(userId)) {
                 ObjectMapper currentObjectMapper = new ObjectMapper();
@@ -175,7 +175,7 @@ public class MemorandumServiceImpl implements MemorandumService {
     }
 
     private void sendAllByUserIds(Set<String> userIdSet) throws IOException {
-        CopyOnWriteArraySet<WebSocketSession> sessions = memorandumWebSocketHandler.getSessions();
+        CopyOnWriteArraySet<WebSocketSession> sessions = memorandumHandler.getSessions();
         for (WebSocketSession session : sessions) {
             String sessionUserId = WSUtil.getUserFromProtocols(session).getId();
             if (userIdSet.contains(sessionUserId)) {

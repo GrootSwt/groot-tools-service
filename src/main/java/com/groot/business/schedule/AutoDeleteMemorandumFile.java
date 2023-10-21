@@ -17,7 +17,7 @@ public class AutoDeleteMemorandumFile {
         this.memorandumService = memorandumService;
     }
 
-    @Scheduled(cron = "* * * */2 * *")
+    @Scheduled(cron = "0 0 * */2 * *")
     public void autoDeleteOutdatedFileTypeMemorandum() {
         try {
             memorandumService.autoDeleteOutdatedFileTypeMemorandum();

@@ -6,8 +6,8 @@ import com.groot.business.bean.request.base.WSRequest;
 import com.groot.business.bean.enums.ChatOperationType;
 import com.groot.business.model.User;
 import com.groot.business.utils.WSUtil;
-import com.groot.business.ws.handler.SendMessageHandler;
-import com.groot.business.ws.handler.UpdateMessageToReadHandler;
+import com.groot.business.ws.service.SendMessageService;
+import com.groot.business.ws.service.UpdateMessageToReadService;
 
 import io.micrometer.common.lang.NonNullApi;
 import lombok.extern.slf4j.Slf4j;
@@ -22,21 +22,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @Component
 @NonNullApi
-public class Chat implements WebSocketHandler {
+public class ChatHandler implements WebSocketHandler {
 
     private static final AtomicInteger sessionNumber = new AtomicInteger(0);
     private static final CopyOnWriteArraySet<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
 
-    private final SendMessageHandler sendMessageHandler;
-    private final UpdateMessageToReadHandler updateMessageToReadHandler;
+    private final SendMessageService sendMessageService;
+    private final UpdateMessageToReadService updateMessageToReadService;
 
     private final ObjectMapper objectMapper;
 
-    public Chat(final UpdateMessageToReadHandler updateMessageToReadHandler,
-                final SendMessageHandler sendMessageHandler,
-                final ObjectMapper objectMapper) {
-        this.updateMessageToReadHandler = updateMessageToReadHandler;
-        this.sendMessageHandler = sendMessageHandler;
+    public ChatHandler(final UpdateMessageToReadService updateMessageToReadService,
+                       final SendMessageService sendMessageService,
+                       final ObjectMapper objectMapper) {
+        this.updateMessageToReadService = updateMessageToReadService;
+        this.sendMessageService = sendMessageService;
         this.objectMapper = objectMapper;
     }
 
@@ -66,11 +66,11 @@ public class Chat implements WebSocketHandler {
                         });
                 // 消息已读
                 if (ChatOperationType.READ.getDesc().equals(requestTemp.getOperationType())) {
-                    updateMessageToReadHandler.handler(session, message, sessions);
+                    updateMessageToReadService.handler(session, message, sessions);
                 }
                 // 发送消息
                 if (ChatOperationType.SEND.getDesc().equals(requestTemp.getOperationType())) {
-                    sendMessageHandler.handler(session, message, sessions);
+                    sendMessageService.handler(session, message, sessions);
                 }
 
             }

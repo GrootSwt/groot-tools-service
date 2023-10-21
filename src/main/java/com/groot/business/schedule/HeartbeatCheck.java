@@ -1,7 +1,7 @@
 package com.groot.business.schedule;
 
-import com.groot.business.ws.MemorandumWebSocketHandler;
-import com.groot.business.ws.Chat;
+import com.groot.business.ws.MemorandumHandler;
+import com.groot.business.ws.ChatHandler;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +10,7 @@ public class HeartbeatCheck {
 
     @Scheduled(fixedRate = 30000)
     public void heartbeatCheck() {
-        MemorandumWebSocketHandler.heartbeat();
-        Chat.heartbeat();
+        MemorandumHandler.heartbeat();
+        ChatHandler.heartbeat();
     }
 }
