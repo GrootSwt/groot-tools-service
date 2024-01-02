@@ -38,7 +38,7 @@ public class FileServiceImpl implements FileService {
             Files.copy(file.getInputStream(), path);
         } catch (IOException e) {
             if (null != path) {
-                CommonUtil.deleteFile(path);
+                CommonUtil.deleteFileAndParentDirIfEmpty(path);
             }
             throw new BusinessRuntimeException("文件上传失败");
         }

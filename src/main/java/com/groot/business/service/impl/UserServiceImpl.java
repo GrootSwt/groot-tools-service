@@ -1,5 +1,6 @@
 package com.groot.business.service.impl;
 
+import cn.dev33.satoken.secure.BCrypt;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.groot.business.exception.BusinessRuntimeException;
 import com.groot.business.bean.response.UserResponse;
@@ -31,9 +32,8 @@ public class UserServiceImpl implements UserService {
     public UserResponse getUserByAccountAndPassword(String account, String password) {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("account", account);
-        wrapper.eq("password", password);
         User user = userMapper.selectOne(wrapper);
-        if (null == user) {
+        if (null == user || !BCrypt.checkpw(password, user.getPassword())) {
             throw new BusinessRuntimeException("账号或密码不正确");
         }
         return new UserResponse(user.getId(), user.getAccount(), user.getDisplayName(), user.getPhoneNumber(), user.getEmail());

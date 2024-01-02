@@ -37,7 +37,7 @@ public class MemorandumController {
     }
 
     @PostMapping(value = "uploadFile")
-    public Response<Void> uploadFile(MultipartFile file) throws IOException {
+    public Response<Void> uploadFile(@NotBlank(message = "文件不可为空") MultipartFile file) throws IOException {
         memorandumService.uploadFile(file);
         return Response.success("文件上传成功");
     }

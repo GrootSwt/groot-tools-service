@@ -114,7 +114,7 @@ public class MemorandumServiceImpl implements MemorandumService {
             String fileId = memorandum.getContent();
             FileModel fileModel = fileMapper.selectById(fileId);
             if (!fileModel.getDeleted() && !ObjectUtils.isEmpty(fileModel.getLocationUrl())) {
-                CommonUtil.deleteFile(Paths.get(fileModel.getLocationUrl()));
+                CommonUtil.deleteFileAndParentDirIfEmpty(Paths.get(fileModel.getLocationUrl()));
                 fileMapper.deleteById(fileId);
             }
             memorandumMapper.deleteById(id);
@@ -149,7 +149,7 @@ public class MemorandumServiceImpl implements MemorandumService {
             List<String> memorandumIdList = memorandumList.stream().map(Memorandum::getId).toList();
             memorandumMapper.deleteBatchIds(memorandumIdList);
             fileModelList.forEach(fileModel -> {
-                CommonUtil.deleteFile(Paths.get(fileModel.getLocationUrl()));
+                CommonUtil.deleteFileAndParentDirIfEmpty(Paths.get(fileModel.getLocationUrl()));
             });
             this.sendAllByUserIds(userIdSet);
         }
