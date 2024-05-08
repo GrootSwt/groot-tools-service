@@ -55,9 +55,12 @@ public class GlobalExceptionHandler {
             List<ObjectError> errors = e.getBindingResult().getAllErrors();
             StringBuilder message = new StringBuilder();
             for (int i = 0; i < errorCount; i++) {
-                message.append(errors.get(i).getDefaultMessage());
-                if (i != errorCount - 1) {
-                    message.append("\n");
+                String errorMessage = errors.get(i).getDefaultMessage();
+                if(message.indexOf(errorMessage) == -1) {
+                    message.append(errors.get(i).getDefaultMessage());
+                    if (i != errorCount - 1) {
+                        message.append("\n");
+                    }
                 }
             }
             return Response.failure(message.toString());

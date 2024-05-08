@@ -57,19 +57,21 @@ public class UpdateMessageToReadService {
                 friendUnreadMessageCount.set(unreadMessageCountDTO.getCount());
             }
         });
-        session.sendMessage(
-                new TextMessage(objectMapper.writeValueAsString(WSResponse.success(
-                        "消息已读成功",
-                        ChatOperationType.READ,
-                        new UpdateMessageToReadData(friendId, unreadMessageIds, userUnreadMessageCount.get())))));
         sessions.forEach(s -> {
             try {
-                User sender = WSUtil.getUserFromProtocols(s);
-                if (sender.getId().equals(friendId)) {
+                User loginedUser = WSUtil.getUserFromProtocols(s);
+                if (loginedUser.getId().equals(friendId)) {
                     s.sendMessage(new TextMessage(objectMapper.writeValueAsString(WSResponse.success(
                             "消息已读成功",
                             ChatOperationType.READ,
                             new UpdateMessageToReadData(userId, unreadMessageIds, friendUnreadMessageCount.get())))));
+                }
+                if (loginedUser.getId().equals(userId)) {
+                    s.sendMessage(
+                            new TextMessage(objectMapper.writeValueAsString(WSResponse.success(
+                                    "消息已读成功",
+                                    ChatOperationType.READ,
+                                    new UpdateMessageToReadData(friendId, unreadMessageIds, userUnreadMessageCount.get())))));
                 }
             } catch (IOException e) {
                 log.error(e.getMessage());

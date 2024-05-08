@@ -32,6 +32,6 @@ public class LoginController {
                         .setExtra("account", userResponse.getAccount())
                         .setExtra("displayName", userResponse.getDisplayName()));
 
-        return Response.success("登陆成功", userResponse);
+        return Response.success("登录成功", userResponse);
     }
 }

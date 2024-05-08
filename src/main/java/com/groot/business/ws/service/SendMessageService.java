@@ -60,20 +60,22 @@ public class SendMessageService {
             }
         });
 
-        session.sendMessage(
-                new TextMessage(objectMapper.writeValueAsString(WSResponse.success(
-                        "发送消息成功",
-                        ChatOperationType.SEND,
-                        new SendMessageData(friendId, messageResponse, userUnreadMessageCount.get())))));
         sessions.forEach(s -> {
             try {
-                User receiver = WSUtil.getUserFromProtocols(s);
-                if (receiver.getId().equals(friendId)) {
+                User loginedUser = WSUtil.getUserFromProtocols(s);
+                if (loginedUser.getId().equals(friendId)) {
                     s.sendMessage(new TextMessage(
                             objectMapper.writeValueAsString(WSResponse.success(
                                     "接收消息成功",
                                     ChatOperationType.SEND,
                                     new SendMessageData(userId, messageResponse, friendUnreadMessageCount.get())))));
+                }
+                if (loginedUser.getId().equals(userId)) {
+                    s.sendMessage(
+                            new TextMessage(objectMapper.writeValueAsString(WSResponse.success(
+                                    "发送消息成功",
+                                    ChatOperationType.SEND,
+                                    new SendMessageData(friendId, messageResponse, userUnreadMessageCount.get())))));
                 }
             } catch (IOException e) {
                 log.error(e.getMessage());

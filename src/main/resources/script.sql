@@ -1,3 +1,14 @@
+create table file
+(
+    id            varchar(20)      not null,
+    original_name varchar(200)     not null comment '文件原始名',
+    location_url  varchar(500)     not null comment '位置绝对路径',
+    create_time   datetime         not null comment '创建时间',
+    update_time   datetime         not null comment '更新时间',
+    deleted       bit default b'0' not null comment '删除标志'
+)
+    comment '文件';
+
 create table friend
 (
     id              varchar(20)      not null
@@ -12,7 +23,7 @@ create table friend
 )
     comment '好友';
 
-create table memorandumHandler
+create table memorandum
 (
     id           varchar(20)      not null
         primary key,
@@ -47,10 +58,10 @@ create table register
     display_name varchar(20)      not null comment '表示名',
     phone_number varchar(20)      null comment '手机号',
     email        varchar(50)      null comment '邮件地址',
+    status       int              not null,
     create_time  datetime         not null comment '创建时间',
     update_time  datetime         not null comment '更新时间',
-    deleted      bit default b'0' not null comment '删除标志',
-    status       int              not null
+    deleted      bit default b'0' not null comment '删除标志'
 )
     comment '注册';
 
@@ -59,7 +70,7 @@ create table user
     id           varchar(20)      not null
         primary key,
     account      varchar(20)      not null comment '账号',
-    password     varchar(20)      not null comment '密码',
+    password     varchar(100)     not null comment '密码',
     display_name varchar(20)      not null comment '表示名',
     phone_number varchar(20)      null comment '电话号码',
     email        varchar(50)      null comment '邮件地址',
@@ -68,17 +79,4 @@ create table user
     deleted      bit default b'0' not null comment '删除标志'
 )
     comment '用户';
-
-create table file
-(
-    id            varchar(20)  not null,
-    original_name varchar(200) not null comment '文件原始名',
-    location_url  varchar(500) not null comment '位置绝对路径',
-    create_time   datetime     not null comment '创建时间',
-    update_time   datetime     not null comment '更新时间',
-    deleted       bit          not null comment '删除标志'
-)
-    comment '文件';
-
-
 
