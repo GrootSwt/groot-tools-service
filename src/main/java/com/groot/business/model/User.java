@@ -1,10 +1,8 @@
 package com.groot.business.model;
 
 import com.groot.business.model.base.BaseModel;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.validator.constraints.Length;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

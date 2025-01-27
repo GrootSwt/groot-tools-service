@@ -1,5 +1,6 @@
 package com.groot.business.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.groot.business.bean.response.base.Response;
 import com.groot.business.model.FileModel;
 import com.groot.business.service.FileService;
@@ -12,6 +13,7 @@ import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("file")
+@SaCheckLogin
 public class FileController {
 
     private final FileService fileService;

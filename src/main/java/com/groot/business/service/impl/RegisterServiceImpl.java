@@ -8,7 +8,6 @@ import com.groot.business.mapper.RegisterMapper;
 import com.groot.business.mapper.UserMapper;
 import com.groot.business.model.Register;
 import com.groot.business.model.User;
-import com.groot.business.service.MailService;
 import com.groot.business.service.RegisterService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,13 +23,11 @@ public class RegisterServiceImpl implements RegisterService {
 
     private final RegisterMapper registerMapper;
     private final UserMapper userMapper;
-    private final MailService mailService;
 
 
-    public RegisterServiceImpl(final RegisterMapper registerMapper, final UserMapper userMapper, final MailService mailService) {
+    public RegisterServiceImpl(final RegisterMapper registerMapper, final UserMapper userMapper) {
         this.registerMapper = registerMapper;
         this.userMapper = userMapper;
-        this.mailService = mailService;
     }
 
     @Override
@@ -64,13 +61,6 @@ public class RegisterServiceImpl implements RegisterService {
         newUser.setDisplayName(register.getDisplayName());
         newUser.setEmail(register.getEmail());
         userMapper.insert(newUser);
-
-        mailService.sendHTMLMail(
-                newUser.getEmail(),
-                "注册成功",
-                "<h1>注册成功，可以访问该网站了</h1><p><a href="+websiteLocation+">"+websiteName+"</a></p>"
-        );
-
     }
 
     @Override

@@ -1,0 +1,19 @@
+# 应用配置
+application:
+  # 数据库配置
+  datasource:
+    # 数据库URL
+    url: jdbc:mysql://192.168.150.144:3306/groot-tools?serveTimezone=UTC
+    # 数据库账号
+    username: root
+    # 数据库密码
+    password: 123456
+  # redis配置
+  redis:
+    host: 192.168.150.144
+    port: 6379
+  # sa-token配置
+  sa-token:
+    jwt-secret-key: uhqeiwfnw12qi32ofiqwoe12uhfiw
+  # 文件上传根路径
+  file-root-path: /app/files

@@ -1,5 +1,5 @@
 server:
-  port: 5173
+  port: 40021
   servlet:
     session:
       timeout: 30s
@@ -7,7 +7,7 @@ spring:
   profiles:
     active: @env@
   jackson:
-    default-property-inclusion: non_null
+    default-property-inclusion: NON_NULL
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${application.datasource.url}
@@ -25,18 +25,6 @@ spring:
           max-wait: -1ms
           max-idle: 10
           min-idle: 0
-  mail:
-    host: ${application.mail.host}
-    port: ${application.mail.port}
-    password: ${application.mail.password}
-    username: ${application.mail.username}
-    properties:
-      mail:
-        stmp:
-          ssl:
-            enable: true
-    protocol: smtp
-    default-encoding: UTF-8
 mybatis-plus:
   type-aliases-package: com.groot.business.model
   mapper-locations: classpath*:/mapper/**/*.xml
