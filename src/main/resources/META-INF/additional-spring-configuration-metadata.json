@@ -1,56 +1,59 @@
-{
-  "properties": [
-    {
-      "name": "application.datasource.url",
-      "type": "java.lang.String"
-    },
-    {
-      "name": "application.datasource.username",
-      "type": "java.lang.String"
-    },
-    {
-      "name": "application.datasource.password",
-      "type": "java.lang.String"
-    },
-    {
-      "name": "application.redis.host",
-      "type": "java.lang.String"
-    },
-    {
-      "name": "application.redis.port",
-      "type": "java.lang.String"
-    },
-    {
-      "name": "application.sa-token.jwt-secret-key",
-      "type": "java.lang.String"
-    },
-    {
-      "name": "application.mail.host",
-      "type": "java.lang.String"
-    },
-    {
-      "name": "application.mail.port",
-      "type": "java.lang.Integer"
-    },
-    {
-      "name": "application.mail.username",
-      "type": "java.lang.String"
-    },
-    {
-      "name": "application.mail.password",
-      "type": "java.lang.String"
-    },
-    {
-      "name": "application.file-root-path",
-      "type": "java.lang.String"
-    },
-    {
-      "name": "application.website.name",
-      "type": "java.lang.String"
-    },
-    {
-      "name": "application.website.location",
-      "type": "java.lang.String"
-    }
-  ]
-}
+{"properties": [
+  {
+    "name": "application.datasource.url",
+    "type": "java.lang.String"
+  },
+  {
+    "name": "application.datasource.username",
+    "type": "java.lang.String"
+  },
+  {
+    "name": "application.datasource.password",
+    "type": "java.lang.String"
+  },
+  {
+    "name": "application.redis.host",
+    "type": "java.lang.String"
+  },
+  {
+    "name": "application.redis.port",
+    "type": "java.lang.String"
+  },
+  {
+    "name": "application.sa-token.jwt-secret-key",
+    "type": "java.lang.String"
+  },
+  {
+    "name": "application.mail.host",
+    "type": "java.lang.String"
+  },
+  {
+    "name": "application.mail.port",
+    "type": "java.lang.Integer"
+  },
+  {
+    "name": "application.mail.username",
+    "type": "java.lang.String"
+  },
+  {
+    "name": "application.mail.password",
+    "type": "java.lang.String"
+  },
+  {
+    "name": "application.file-root-path",
+    "type": "java.lang.String"
+  },
+  {
+    "name": "application.website.name",
+    "type": "java.lang.String"
+  },
+  {
+    "name": "application.website.location",
+    "type": "java.lang.String"
+  },
+  {
+    "name": "application.server.port",
+    "type": "java.lang.String",
+    "description": "A description for 'application.server.port'"
+  }
+]}

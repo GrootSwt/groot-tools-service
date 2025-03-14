@@ -7,7 +7,7 @@ export ENV="prod"
 echo "当前环境: $ENV"
 
 # 执行 Maven 打包，激活 prod 配置
-mvn clean package -Pprod -DskipTests
+mvn clean package -P prod -D skipTests
 
 # 检查是否构建成功
 if [ $? -eq 0 ]; then

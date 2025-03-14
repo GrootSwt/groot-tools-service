@@ -1,5 +1,7 @@
 # 应用配置
 application:
+  server:
+    port: 40021
   # 数据库配置
   datasource:
     # 数据库URL

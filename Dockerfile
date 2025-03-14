@@ -11,4 +11,4 @@ COPY target/groot-tools-service.jar app.jar
 EXPOSE 40021
 
 # 运行 Spring Boot 应用
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-XX:-UseContainerSupport", "-jar", "app.jar"]
